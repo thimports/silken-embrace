@@ -1,26 +1,54 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Header } from "@/components/site/Header";
+import { Hero } from "@/components/site/Hero";
+import { ProductSection } from "@/components/site/ProductSection";
+import { Benefits } from "@/components/site/Benefits";
+import { Comparison } from "@/components/site/Comparison";
+import { Lookbook } from "@/components/site/Lookbook";
+import { Testimonials } from "@/components/site/Testimonials";
+import { Faq } from "@/components/site/Faq";
+import { Footer } from "@/components/site/Footer";
+import { MobileBuyBar } from "@/components/site/MobileBuyBar";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Meia-Calça Forrada Térmica Translúcida Plus · Lumière" },
+      {
+        name: "description",
+        content:
+          "Meia-calça forrada com lã peluciada, translúcida e modeladora. Conforto térmico premium, elegância europeia. Frete rápido e garantia.",
+      },
+      { property: "og:title", content: "Meia-Calça Forrada Térmica Translúcida · Lumière" },
+      { property: "og:description", content: "Aqueça seus dias frios com elegância. Coleção Hiver '26." },
+    ],
+    links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Inter:wght@300;400;500;600&display=swap",
+      },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
+function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen bg-background text-foreground">
+      <Header />
+      <main className="pb-24 lg:pb-0">
+        <Hero />
+        <ProductSection />
+        <Benefits />
+        <Comparison />
+        <Lookbook />
+        <Testimonials />
+        <Faq />
+      </main>
+      <Footer />
+      <MobileBuyBar />
     </div>
   );
-}
-
-function Index() {
-  return <PlaceholderIndex />;
 }
