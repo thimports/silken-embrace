@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { Star, Minus, Plus, Shield, Truck, RotateCcw, Lock, Eye, Flame } from "lucide-react";
-import hero from "@/assets/hero.jpg";
-import p1 from "@/assets/product-1.jpg";
-import p2 from "@/assets/product-2.jpg";
-import look from "@/assets/lookbook-2.jpg";
+import hero from "@/assets/hero.webp";
+import p1 from "@/assets/product-1.webp";
+import p2 from "@/assets/product-2.webp";
+import look from "@/assets/lookbook-2.webp";
 
 const IMAGES = [hero, p1, p2, look];
 const SIZES = ["P/M", "G/GG", "XG (Plus)"];

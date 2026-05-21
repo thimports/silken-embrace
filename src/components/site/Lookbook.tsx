@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
-import l1 from "@/assets/lookbook-1.jpg";
-import l2 from "@/assets/lookbook-2.jpg";
-import l3 from "@/assets/lookbook-3.jpg";
+import l1 from "@/assets/lookbook-1.webp";
+import l2 from "@/assets/lookbook-2.webp";
+import l3 from "@/assets/lookbook-3.webp";
 
 const LOOKS = [
   { src: l1, t: "Rues de Paris", s: "Casaco camel + booties caramelo" },
