@@ -39,7 +39,6 @@ function Index() {
     <div className="min-h-screen bg-background text-foreground">
       <Header />
       <main className="pb-24 lg:pb-0">
-        <Hero />
         <ProductSection />
         <Benefits />
         <Comparison />
