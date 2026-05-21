@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { Star, ArrowRight } from "lucide-react";
-import hero from "@/assets/hero.jpg";
+import hero from "@/assets/hero.webp";
 
 export function Hero() {
   return (
