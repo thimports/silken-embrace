@@ -167,6 +167,14 @@ function CheckoutPage() {
         </div>
       </header>
 
+      {pixTx ? (
+        <div className="mx-auto max-w-[1280px] px-4 md:px-10 py-8 md:py-12">
+          <PixPayment transaction={pixTx} productTitle={PRODUCT_TITLE} productMeta={PRODUCT_META} />
+        </div>
+      ) : (
+      <>
+
+
 
       <div className="mx-auto max-w-[1280px] grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-8 lg:gap-10 px-4 md:px-10 py-6 md:py-10 lg:py-16">
         {/* Steps + content */}
