@@ -7,6 +7,7 @@ import { Comparison } from "@/components/site/Comparison";
 import { Lookbook } from "@/components/site/Lookbook";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Faq } from "@/components/site/Faq";
+import { TrustBar } from "@/components/site/TrustBar";
 import { Footer } from "@/components/site/Footer";
 import { MobileBuyBar } from "@/components/site/MobileBuyBar";
 
@@ -45,6 +46,7 @@ function Index() {
         <Lookbook />
         <Testimonials />
         <Faq />
+        <TrustBar />
       </main>
       <Footer />
       <MobileBuyBar />
