@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Check, ChevronLeft, Lock, Shield, Truck, CreditCard, QrCode, RotateCcw, Loader2, AlertCircle } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
@@ -58,6 +58,9 @@ function CheckoutPage() {
   const [pixTx, setPixTx] = useState<{ id: number; amount: number; pix: { qrcode: string; expirationDate?: string } } | null>(null);
   const [cardResult, setCardResult] = useState<{ status: string; refusedReason?: any } | null>(null);
   const [paid, setPaid] = useState(false);
+  const [prewarming, setPrewarming] = useState(false);
+  const finalizedRef = useRef(false);
+  const lastSigRef = useRef<string>("");
 
   const SHIPPING = [
     { id: "free", label: "Frete Grátis", speed: "7-8 dias úteis", price: 0 },
