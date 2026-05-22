@@ -118,6 +118,7 @@ function CheckoutPage() {
           },
         }});
         setCardResult({ status: r.status, refusedReason: r.refusedReason });
+        if (r.status === "paid") setPaid(true);
       }
     } catch (e: any) {
       setError(e?.message || "Erro ao processar pagamento. Tente novamente.");
