@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { Star, Shield, Truck, RotateCcw, Lock, Eye } from "lucide-react";
+import { CustomerReviewsCarousel } from "./CustomerReviewsCarousel";
 import hero from "@/assets/hero.webp";
 import p1 from "@/assets/product-1.webp";
 import p2 from "@/assets/product-2.webp";
@@ -136,6 +137,8 @@ export function ProductSection() {
               Adicionar à sacola
             </button>
           </div>
+
+          <CustomerReviewsCarousel />
 
           {/* Trust */}
           <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-border/60">
