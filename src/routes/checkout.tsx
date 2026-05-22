@@ -10,12 +10,6 @@ export const Route = createFileRoute("/checkout")({
       { title: "Checkout · Lumière" },
       { name: "description", content: "Finalize sua compra com segurança." },
     ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap",
-      },
-    ],
   }),
   component: CheckoutPage,
 });
