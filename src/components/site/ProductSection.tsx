@@ -117,16 +117,9 @@ export function ProductSection() {
               <span>Tamanho</span>
               <a href="#" className="text-foreground normal-case tracking-normal underline underline-offset-4">Guia de medidas</a>
             </div>
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {SIZES.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setSize(s)}
-                  className={`min-w-[44px] px-3 py-2 text-xs tracking-wide border transition-all ${size === s ? "border-foreground bg-foreground text-background" : "border-border hover:border-foreground/60"}`}
-                >
-                  {s}
-                </button>
-              ))}
+            <div className="mt-3 inline-flex items-baseline gap-2 border border-foreground bg-foreground text-background px-4 py-2.5">
+              <span className="text-xs tracking-luxe uppercase">Tamanho Único</span>
+              <span className="text-[11px] opacity-80">veste do 34 ao 44</span>
             </div>
           </div>
 
