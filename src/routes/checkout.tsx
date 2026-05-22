@@ -74,6 +74,29 @@ function CheckoutPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const lookupCep = async (rawCep: string) => {
+    const digits = onlyDigits(rawCep);
+    if (digits.length !== 8) return;
+    setCepLoading(true);
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
+      const data = await res.json();
+      if (!data.erro) {
+        setF((prev) => ({
+          ...prev,
+          street: data.logradouro || prev.street,
+          complement: prev.complement || data.complemento || "",
+          city: data.localidade || prev.city,
+          state: data.uf || prev.state,
+        }));
+      }
+    } catch {
+      // ignore — usuário pode preencher manualmente
+    } finally {
+      setCepLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-cream">
       {/* slim header */}
