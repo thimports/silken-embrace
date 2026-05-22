@@ -5,7 +5,9 @@ import { Check, ChevronLeft, Lock, Shield, Truck, CreditCard, QrCode, RotateCcw,
 import { useServerFn } from "@tanstack/react-start";
 import { createPixTransaction, createCardTransaction } from "@/lib/primecash.functions";
 import { sendFbEvent } from "@/lib/fb-capi.functions";
+import { sendUtmifyOrder } from "@/lib/utmify.functions";
 import { fbTrack, getFbp, getFbc, newEventId } from "@/lib/fbpixel";
+import { getUtms } from "@/lib/utm";
 import { PixPayment } from "@/components/checkout/PixPayment";
 import { PaymentConfirmed } from "@/components/checkout/PaymentConfirmed";
 import hero from "@/assets/hero.webp";
@@ -67,6 +69,8 @@ function CheckoutPage() {
   const pixFn = useServerFn(createPixTransaction);
   const cardFn = useServerFn(createCardTransaction);
   const capiFn = useServerFn(sendFbEvent);
+  const utmifyFn = useServerFn(sendUtmifyOrder);
+  const [orderCtx, setOrderCtx] = useState<{ orderId: string; createdAt: string } | null>(null);
 
   // Fire InitiateCheckout once on mount
   useEffect(() => {
@@ -105,6 +109,53 @@ function CheckoutPage() {
   });
   const buildItems = () => ([{ title: PRODUCT_TITLE, unitPrice: Math.round(subtotal * 100), quantity: 1, tangible: true }]);
 
+  const utcNow = () => {
+    const d = new Date();
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
+  };
+
+  const buildUtmifyOrder = (opts: {
+    orderId: string;
+    createdAt: string;
+    status: "waiting_payment" | "paid" | "refused" | "refunded" | "chargedback";
+    paymentMethod: "pix" | "credit_card";
+    approvedDate: string | null;
+    refundedAt?: string | null;
+  }) => {
+    const totalCents = Math.round(total * 100);
+    return {
+      orderId: opts.orderId,
+      paymentMethod: opts.paymentMethod,
+      status: opts.status,
+      createdAt: opts.createdAt,
+      approvedDate: opts.approvedDate,
+      refundedAt: opts.refundedAt ?? null,
+      customer: {
+        name: f.name,
+        email: f.email,
+        phone: onlyDigits(f.phone) || null,
+        document: onlyDigits(f.cpf) || null,
+        country: "BR",
+      },
+      products: [{
+        id: "lumiere-meia-2pk",
+        name: PRODUCT_TITLE,
+        planId: null,
+        planName: null,
+        quantity: 1,
+        priceInCents: Math.round(subtotal * 100),
+      }],
+      trackingParameters: getUtms(),
+      commission: {
+        totalPriceInCents: totalCents,
+        gatewayFeeInCents: 0,
+        userCommissionInCents: totalCents,
+        currency: "BRL" as const,
+      },
+    };
+  };
+
   const handleFinish = async () => {
     setError(null);
     if (!f.name || !f.email || !f.cpf || !f.phone) {
@@ -124,9 +175,14 @@ function CheckoutPage() {
         }});
         if (!tx?.pix?.qrcode) throw new Error("Não recebemos o código PIX. Tente novamente.");
         setPixTx({ id: tx.id, amount: tx.amount, pix: tx.pix });
+
+        const createdAt = utcNow();
+        const orderId = String(tx.id);
+        setOrderCtx({ orderId, createdAt });
+
         // Track Purchase as soon as PIX is generated (per requirement)
         const eventId = `purchase-pix-${tx.id}`;
-        fbTrack("Purchase", { value: total, currency: "BRL", content_ids: ["lumiere-meia-2pk"], content_type: "product", order_id: String(tx.id) }, { eventID: eventId });
+        fbTrack("Purchase", { value: total, currency: "BRL", content_ids: ["lumiere-meia-2pk"], content_type: "product", order_id: orderId }, { eventID: eventId });
         capiFn({ data: {
           eventName: "Purchase",
           eventId,
@@ -136,8 +192,14 @@ function CheckoutPage() {
           fbp: getFbp(),
           fbc: getFbc(),
           user: { email: f.email, phone: f.phone, name: f.name, cpf: f.cpf, city: f.city, state: f.state, zip: f.cep },
-          customData: { order_id: String(tx.id), payment_method: "pix" },
+          customData: { order_id: orderId, payment_method: "pix" },
         }}).catch(() => {});
+
+        // Utmify: PIX gerado (waiting_payment)
+        utmifyFn({ data: buildUtmifyOrder({
+          orderId, createdAt, status: "waiting_payment", paymentMethod: "pix",
+          approvedDate: null,
+        }) }).catch(() => {});
       } else {
         const [mm, yy] = f.cardExp.split("/");
         const r = await cardFn({ data: {
@@ -155,9 +217,12 @@ function CheckoutPage() {
           },
         }});
         setCardResult({ status: r.status, refusedReason: r.refusedReason });
+        const createdAt = utcNow();
+        const orderId = String(r.id ?? r.secureId ?? Date.now());
+
         if (r.status === "paid") {
           setPaid(true);
-          const eventId = `purchase-card-${r.id ?? Date.now()}`;
+          const eventId = `purchase-card-${orderId}`;
           fbTrack("Purchase", { value: total, currency: "BRL", content_ids: ["lumiere-meia-2pk"], content_type: "product" }, { eventID: eventId });
           capiFn({ data: {
             eventName: "Purchase",
@@ -170,6 +235,16 @@ function CheckoutPage() {
             user: { email: f.email, phone: f.phone, name: f.name, cpf: f.cpf, city: f.city, state: f.state, zip: f.cep },
             customData: { payment_method: "credit_card" },
           }}).catch(() => {});
+
+          utmifyFn({ data: buildUtmifyOrder({
+            orderId, createdAt, status: "paid", paymentMethod: "credit_card",
+            approvedDate: createdAt,
+          }) }).catch(() => {});
+        } else {
+          utmifyFn({ data: buildUtmifyOrder({
+            orderId, createdAt, status: "refused", paymentMethod: "credit_card",
+            approvedDate: null,
+          }) }).catch(() => {});
         }
       }
     } catch (e: any) {
@@ -228,7 +303,18 @@ function CheckoutPage() {
         </div>
       ) : pixTx ? (
         <div className="mx-auto max-w-[1280px] px-4 md:px-10 py-8 md:py-12">
-          <PixPayment transaction={pixTx} productTitle={PRODUCT_TITLE} productMeta={PRODUCT_META} onPaid={() => setPaid(true)} />
+          <PixPayment transaction={pixTx} productTitle={PRODUCT_TITLE} productMeta={PRODUCT_META} onPaid={() => {
+            setPaid(true);
+            if (orderCtx) {
+              utmifyFn({ data: buildUtmifyOrder({
+                orderId: orderCtx.orderId,
+                createdAt: orderCtx.createdAt,
+                status: "paid",
+                paymentMethod: "pix",
+                approvedDate: utcNow(),
+              }) }).catch(() => {});
+            }
+          }} />
         </div>
       ) : (
       <>
