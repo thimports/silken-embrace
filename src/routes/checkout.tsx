@@ -66,8 +66,22 @@ function CheckoutPage() {
 
   const pixFn = useServerFn(createPixTransaction);
   const cardFn = useServerFn(createCardTransaction);
+  const capiFn = useServerFn(sendFbEvent);
 
-  // form state
+  // Fire InitiateCheckout once on mount
+  useEffect(() => {
+    const eventId = newEventId();
+    fbTrack("InitiateCheckout", { value: 79.9, currency: "BRL", content_ids: ["lumiere-meia-2pk"], content_type: "product" }, { eventID: eventId });
+    capiFn({ data: {
+      eventName: "InitiateCheckout",
+      eventId,
+      eventSourceUrl: typeof window !== "undefined" ? window.location.href : undefined,
+      value: 79.9,
+      currency: "BRL",
+      fbp: getFbp(),
+      fbc: getFbc(),
+    }}).catch(() => {});
+  }, [capiFn]);
   const [f, setF] = useState({
     name: "", email: "", phone: "", cpf: "",
     cep: "", street: "", number: "", complement: "", city: "", state: "",
