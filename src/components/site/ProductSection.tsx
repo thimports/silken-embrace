@@ -89,23 +89,28 @@ export function ProductSection() {
           </div>
 
           {/* Color */}
-          <div className="mt-7">
-            <div className="flex items-center justify-between text-[12px] tracking-luxe uppercase text-muted-foreground">
-              <span>Cor</span>
-              <span className="text-foreground normal-case tracking-normal">{color}</span>
+          {[
+            { label: "Cor · Meia 1", value: color1, set: setColor1 },
+            { label: "Cor · Meia 2", value: color2, set: setColor2 },
+          ].map((sel) => (
+            <div key={sel.label} className="mt-7">
+              <div className="flex items-center justify-between text-[12px] tracking-luxe uppercase text-muted-foreground">
+                <span>{sel.label}</span>
+                <span className="text-foreground normal-case tracking-normal">{sel.value}</span>
+              </div>
+              <div className="mt-3 flex gap-3">
+                {COLORS.map((c) => (
+                  <button
+                    key={c.name}
+                    onClick={() => sel.set(c.name)}
+                    className={`size-10 rounded-full border transition-all ${sel.value === c.name ? "border-foreground ring-2 ring-foreground/10 ring-offset-2 ring-offset-background" : "border-border"}`}
+                    style={{ background: c.value }}
+                    aria-label={c.name}
+                  />
+                ))}
+              </div>
             </div>
-            <div className="mt-3 flex gap-3">
-              {COLORS.map((c) => (
-                <button
-                  key={c.name}
-                  onClick={() => setColor(c.name)}
-                  className={`size-10 rounded-full border transition-all ${color === c.name ? "border-foreground ring-2 ring-foreground/10 ring-offset-2 ring-offset-background" : "border-border"}`}
-                  style={{ background: c.value }}
-                  aria-label={c.name}
-                />
-              ))}
-            </div>
-          </div>
+          ))}
 
           {/* Size */}
           <div className="mt-7">
