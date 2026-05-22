@@ -63,6 +63,10 @@ function CheckoutPage() {
   const lastSigRef = useRef<string>("");
   const pixPromiseRef = useRef<Promise<{ id: number; amount: number; pix: { qrcode: string; expirationDate?: string } } | null> | null>(null);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [step]);
+
   const SHIPPING = [
     { id: "free", label: "Frete Grátis", speed: "7-8 dias úteis", price: 0 },
     { id: "express", label: "Loggi Express", speed: "3-4 dias úteis", price: 15 },
