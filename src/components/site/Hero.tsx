@@ -81,7 +81,7 @@ export function Hero() {
               </div>
               <div className="glass rounded-sm px-4 py-3 text-right">
                 <div className="text-[10px] tracking-luxe uppercase text-muted-foreground">A partir de</div>
-                <div className="font-display text-lg leading-none mt-1">R$ 89</div>
+                <div className="font-display text-lg leading-none mt-1">R$ 79</div>
               </div>
             </div>
           </div>
