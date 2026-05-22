@@ -130,11 +130,6 @@ export function ProductSection() {
             </div>
           </div>
 
-          {/* Stock urgency */}
-          <div className="mt-6 flex items-center gap-2 text-[13px] text-destructive/80">
-            <Flame className="h-4 w-4" strokeWidth={1.5} />
-            Apenas <strong>{stock} unidades</strong> restantes no estoque
-          </div>
 
           {/* Quantity + CTA */}
           <div className="mt-6 flex flex-col gap-3">
