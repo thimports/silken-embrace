@@ -5,7 +5,9 @@ import { Check, ChevronLeft, Lock, Shield, Truck, CreditCard, QrCode, RotateCcw,
 import { useServerFn } from "@tanstack/react-start";
 import { createPixTransaction, createCardTransaction } from "@/lib/primecash.functions";
 import { sendFbEvent } from "@/lib/fb-capi.functions";
+import { sendUtmifyOrder } from "@/lib/utmify.functions";
 import { fbTrack, getFbp, getFbc, newEventId } from "@/lib/fbpixel";
+import { getUtms } from "@/lib/utm";
 import { PixPayment } from "@/components/checkout/PixPayment";
 import { PaymentConfirmed } from "@/components/checkout/PaymentConfirmed";
 import hero from "@/assets/hero.webp";
