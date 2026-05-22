@@ -119,6 +119,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   useEffect(() => {
+    captureUtms();
     initFbPixel();
   }, []);
 
