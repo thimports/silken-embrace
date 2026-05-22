@@ -54,6 +54,13 @@ function CheckoutPage() {
   const [cardResult, setCardResult] = useState<{ status: string; refusedReason?: any } | null>(null);
   const [paid, setPaid] = useState(false);
 
+  const SHIPPING = [
+    { id: "free", label: "Frete Grátis", speed: "7-8 dias úteis", price: 0 },
+    { id: "express", label: "Loggi Express", speed: "3-4 dias úteis", price: 15 },
+  ] as const;
+  const [shippingId, setShippingId] = useState<string>("free");
+  const shipping = SHIPPING.find((s) => s.id === shippingId)?.price ?? 0;
+
   const pixFn = useServerFn(createPixTransaction);
   const cardFn = useServerFn(createCardTransaction);
 
@@ -69,7 +76,6 @@ function CheckoutPage() {
   const back = () => setStep((s) => Math.max(0, s - 1));
 
   const subtotal = 79.9;
-  const shipping = 0;
   const discount = pay === "pix" ? subtotal * 0.05 : 0;
   const total = subtotal + shipping - discount;
   const PRODUCT_TITLE = "2 Meia-Calça Forrada Térmica Translúcida · Lã Peluciada Plus";
@@ -240,9 +246,29 @@ function CheckoutPage() {
                     <Field label="Cidade" value={f.city} onChange={set("city")} placeholder="São Paulo" />
                     <Field label="Estado" value={f.state} onChange={set("state")} placeholder="SP" />
                   </div>
-                  <div className="flex items-center gap-3 bg-secondary/60 p-4 text-sm">
-                    <Truck className="h-4 w-4 text-caramel" strokeWidth={1.5} />
-                    <span><strong>Frete grátis</strong> · entrega em 5-8 dias úteis</span>
+
+                  <div className="pt-2">
+                    <span className="text-[11px] tracking-luxe uppercase text-muted-foreground">Opção de frete</span>
+                    <div className="mt-3 space-y-2">
+                      {SHIPPING.map((s) => (
+                        <button
+                          key={s.id}
+                          onClick={() => setShippingId(s.id)}
+                          className={`w-full flex items-center gap-3 p-4 border transition-all text-left ${shippingId === s.id ? "border-foreground bg-foreground/[0.03]" : "border-border"}`}
+                        >
+                          <div className={`size-5 rounded-full border-2 grid place-items-center shrink-1 ${shippingId === s.id ? "border-foreground" : "border-border"}`}>
+                            {shippingId === s.id && <div className="size-2.5 rounded-full bg-foreground" />}
+                          </div>
+                          <div className="flex-1 min-w-1">
+                            <div className="text-[13px] font-medium">{s.label}</div>
+                            <div className="text-[11px] text-muted-foreground">{s.speed}</div>
+                          </div>
+                          <div className={`text-sm font-medium whitespace-nowrap ${s.price === 0 ? "text-caramel" : ""}`}>
+                            {s.price === 0 ? "Grátis" : `R$ ${s.price.toFixed(2).replace(".", ",")}`}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
@@ -351,7 +377,7 @@ function CheckoutPage() {
 
             <div className="mt-6 pt-6 border-t border-border space-y-2.5 text-sm">
               <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>R$ {subtotal.toFixed(2).replace(".", ",")}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Frete</span><span className="text-caramel">Grátis</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Frete</span><span className={shipping === 0 ? "text-caramel" : ""}>{shipping === 0 ? "Grátis" : `R$ ${shipping.toFixed(2).replace(".", ",")}`}</span></div>
               {discount > 0 && (
                 <div className="flex justify-between"><span className="text-muted-foreground">Desconto PIX (5%)</span><span className="text-caramel">- R$ {discount.toFixed(2).replace(".", ",")}</span></div>
               )}
