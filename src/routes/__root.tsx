@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { initFbPixel } from "@/lib/fbpixel";
+import { captureUtms } from "@/lib/utm";
 
 import appCss from "../styles.css?url";
 
