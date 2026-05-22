@@ -34,7 +34,7 @@ export function ProductSection() {
             initial={{ opacity: 0, scale: 1.01 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4 }}
-            className="order-1 lg:order-2 relative w-full aspect-square lg:aspect-[4/5] overflow-hidden rounded-2xl lg:rounded-none bg-secondary/60 group flex items-center justify-center p-3 sm:p-5 lg:p-0"
+            className="order-1 lg:order-2 relative w-full aspect-square lg:aspect-[4/5] overflow-hidden rounded-2xl lg:rounded-none group flex items-center justify-center p-3 sm:p-5 lg:p-0"
           >
             <img
               src={IMAGES[img]}
@@ -50,7 +50,7 @@ export function ProductSection() {
               <button
                 key={i}
                 onClick={() => setImg(i)}
-                className={`relative shrink-0 aspect-square w-[64px] sm:w-[72px] overflow-hidden rounded-lg border bg-secondary/60 flex items-center justify-center p-1.5 transition-all ${
+                className={`relative shrink-0 aspect-square w-[64px] sm:w-[72px] overflow-hidden rounded-lg border flex items-center justify-center p-1.5 transition-all ${
                   img === i ? "border-foreground" : "border-border/60 opacity-70 hover:opacity-100"
                 }`}
               >
