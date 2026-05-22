@@ -15,7 +15,8 @@ const COLORS = [
 
 export function ProductSection() {
   const [img, setImg] = useState(0);
-  const [color, setColor] = useState(COLORS[0].name);
+  const [color1, setColor1] = useState(COLORS[0].name);
+  const [color2, setColor2] = useState(COLORS[0].name);
   const [viewers, setViewers] = useState(22);
 
   useEffect(() => {
