@@ -62,9 +62,9 @@ function CheckoutPage() {
   const next = () => setStep((s) => Math.min(2, s + 1));
   const back = () => setStep((s) => Math.max(0, s - 1));
 
-  const subtotal = 89.9;
+  const subtotal = 79.9;
   const shipping = 0;
-  const discount = pay === "pix" ? subtotal * 0.1 : 0;
+  const discount = pay === "pix" ? subtotal * 0.05 : 0;
   const total = subtotal + shipping - discount;
 
   const copyPix = () => {
