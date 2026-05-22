@@ -49,6 +49,7 @@ function Field({ label, ...p }: React.InputHTMLAttributes<HTMLInputElement> & { 
 function CheckoutPage() {
   const [step, setStep] = useState(0);
   const [pay, setPay] = useState<"pix" | "card">("pix");
+  const [cepLoading, setCepLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
   // form state
