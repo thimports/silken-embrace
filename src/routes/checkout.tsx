@@ -52,6 +52,7 @@ function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
   const [pixTx, setPixTx] = useState<{ id: number; amount: number; pix: { qrcode: string; expirationDate?: string } } | null>(null);
   const [cardResult, setCardResult] = useState<{ status: string; refusedReason?: any } | null>(null);
+  const [paid, setPaid] = useState(false);
 
   const pixFn = useServerFn(createPixTransaction);
   const cardFn = useServerFn(createCardTransaction);
