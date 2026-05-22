@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { Star, Minus, Plus, Shield, Truck, RotateCcw, Lock, Eye, Flame } from "lucide-react";
 import hero from "@/assets/hero.webp";
@@ -19,45 +19,61 @@ export function ProductSection() {
   const [size, setSize] = useState(SIZES[0]);
   const [color, setColor] = useState(COLORS[0].name);
   const [qty, setQty] = useState(1);
-  const [viewers] = useState(() => 14 + Math.floor(Math.random() * 22));
-  const [stock] = useState(() => 8 + Math.floor(Math.random() * 7));
+  const [loaded, setLoaded] = useState(false);
+  const [viewers, setViewers] = useState(22);
+  const [stock, setStock] = useState(11);
+
+  useEffect(() => {
+    setViewers(14 + Math.floor(Math.random() * 22));
+    setStock(8 + Math.floor(Math.random() * 7));
+  }, []);
+
+  useEffect(() => {
+    setLoaded(false);
+  }, [img]);
 
   return (
     <section id="detalhes" className="border-t border-border/60 bg-background">
       <div className="mx-auto max-w-[1400px] grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-16 px-5 md:px-10 py-16 lg:py-24">
         {/* Gallery */}
-        <div className="grid grid-cols-[72px_1fr] gap-4 md:gap-6">
-          <div className="flex lg:flex-col gap-3 order-2 lg:order-1 col-span-2 lg:col-span-1 overflow-x-auto no-scrollbar lg:overflow-visible">
+        <div className="grid grid-cols-1 lg:grid-cols-[72px_1fr] gap-4 md:gap-6">
+          <motion.div
+            key={img}
+            initial={{ opacity: 0.4, scale: 1.01 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="order-1 lg:order-2 relative w-full aspect-square lg:aspect-[4/5] overflow-hidden rounded-2xl lg:rounded-none bg-secondary/60 group flex items-center justify-center p-3 sm:p-5 lg:p-0"
+          >
+            {!loaded && (
+              <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-secondary to-muted" />
+            )}
+            <img
+              src={IMAGES[img]}
+              alt="Meia-calça forrada térmica translúcida"
+              onLoad={() => setLoaded(true)}
+              className={`relative max-h-full max-w-full w-auto h-auto object-contain lg:h-full lg:w-full lg:object-cover transition-all duration-700 ${loaded ? "opacity-100" : "opacity-0"} group-hover:lg:scale-105`}
+              loading="lazy"
+            />
+            <span className="absolute top-4 left-4 bg-background/90 backdrop-blur px-3 py-1 text-[10px] tracking-luxe uppercase z-10">
+              Edição inverno
+            </span>
+          </motion.div>
+
+          <div className="flex lg:flex-col gap-3 order-2 lg:order-1 overflow-x-auto no-scrollbar lg:overflow-visible -mx-1 px-1">
             {IMAGES.map((src, i) => (
               <button
                 key={i}
                 onClick={() => setImg(i)}
-                className={`relative shrink-0 aspect-[4/5] w-[72px] overflow-hidden border transition-all ${
-                  img === i ? "border-foreground" : "border-transparent opacity-70 hover:opacity-100"
+                className={`relative shrink-0 aspect-square w-[64px] sm:w-[72px] overflow-hidden rounded-lg border bg-secondary/60 flex items-center justify-center p-1.5 transition-all ${
+                  img === i ? "border-foreground" : "border-border/60 opacity-70 hover:opacity-100"
                 }`}
               >
-                <img src={src} alt="" className="h-full w-full object-cover" loading="lazy" />
+                <img src={src} alt="" className="max-h-full max-w-full object-contain" loading="lazy" />
               </button>
             ))}
           </div>
-          <motion.div
-            key={img}
-            initial={{ opacity: 0.4, scale: 1.02 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="order-1 lg:order-2 col-span-2 lg:col-span-1 relative aspect-[4/5] overflow-hidden bg-secondary group"
-          >
-            <img
-              src={IMAGES[img]}
-              alt="Meia-calça forrada térmica translúcida"
-              className="h-full w-full object-cover transition-transform duration-[1.2s] group-hover:scale-105"
-              loading="lazy"
-            />
-            <span className="absolute top-4 left-4 bg-background/90 backdrop-blur px-3 py-1 text-[10px] tracking-luxe uppercase">
-              Edição inverno
-            </span>
-          </motion.div>
         </div>
+
 
         {/* Buy box */}
         <div id="comprar" className="lg:pt-4">
