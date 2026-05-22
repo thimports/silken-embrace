@@ -61,6 +61,7 @@ function CheckoutPage() {
   const [prewarming, setPrewarming] = useState(false);
   const finalizedRef = useRef(false);
   const lastSigRef = useRef<string>("");
+  const pixPromiseRef = useRef<Promise<{ id: number; amount: number; pix: { qrcode: string; expirationDate?: string } } | null> | null>(null);
 
   const SHIPPING = [
     { id: "free", label: "Frete Grátis", speed: "7-8 dias úteis", price: 0 },
