@@ -237,7 +237,7 @@ function CheckoutPage() {
                 <img src={hero} alt="" className="h-full w-full object-cover" />
               </div>
               <div className="flex-1">
-                <div className="text-[13px] font-medium leading-snug">Meia-Calça Forrada Térmica Translúcida · Lã Peluciada Plus</div>
+                <div className="text-[13px] font-medium leading-snug">2 Meia-Calça Forrada Térmica Translúcida · Lã Peluciada Plus</div>
                 <div className="mt-1 text-xs text-muted-foreground">Cor: Nude · Tamanho: G/GG · Qtd: 1</div>
               </div>
               <div className="font-display text-base">R$ 79,90</div>
