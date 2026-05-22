@@ -1,5 +1,7 @@
 import { motion } from "motion/react";
 import { Flame, Sparkles, Move, Scissors, Heart, Snowflake, Feather, Wind } from "lucide-react";
+import boxesImg from "@/assets/lumiere-boxes.png";
+
 
 const ITEMS = [
   { I: Flame, t: "Forro térmico macio", d: "Lã peluciada interna que aquece sem aumentar volume." },
