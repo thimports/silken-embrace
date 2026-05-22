@@ -30,7 +30,7 @@ export function ProductSection() {
     <section id="detalhes" className="border-t border-border/60 bg-background">
       <div className="mx-auto max-w-[1400px] grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-16 px-5 md:px-10 pt-4 pb-16 lg:pt-12 lg:pb-24">
         {/* Gallery */}
-        <div className="grid grid-cols-1 lg:grid-cols-[72px_1fr] gap-4 md:gap-6">
+        <div className="min-w-0 grid grid-cols-1 lg:grid-cols-[72px_1fr] gap-4 md:gap-6">
           <motion.div
             key={img}
             initial={{ opacity: 0, scale: 1.01 }}
