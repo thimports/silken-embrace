@@ -8,6 +8,14 @@ import r6 from "@/assets/reviews/r6.jpg";
 import r7 from "@/assets/reviews/r7.jpg";
 import r8 from "@/assets/reviews/r8.jpg";
 import r9 from "@/assets/reviews/r9.jpg";
+import r10 from "@/assets/reviews/r10.jpg";
+import r11 from "@/assets/reviews/r11.jpg";
+import r12 from "@/assets/reviews/r12.jpg";
+import r13 from "@/assets/reviews/r13.jpg";
+import r14 from "@/assets/reviews/r14.jpg";
+import r15 from "@/assets/reviews/r15.jpg";
+import r16 from "@/assets/reviews/r16.jpg";
+import r17 from "@/assets/reviews/r17.jpg";
 
 const REVIEWS = [
   { img: r1, name: "Mariana A.", text: "Aquece muito, super confortável. Amei!" },
@@ -19,6 +27,14 @@ const REVIEWS = [
   { img: r7, name: "Luiza R.", text: "Translucidez perfeita, parece europeia" },
   { img: r8, name: "Renata C.", text: "Salvou meu inverno, quentinha de verdade" },
   { img: r9, name: "Aline P.", text: "Acabamento impecável, comprei outra cor" },
+  { img: r10, name: "Bruna F.", text: "Caimento maravilhoso, modela super bem" },
+  { img: r11, name: "Tatiane M.", text: "Translúcida e quentinha, melhor que esperava" },
+  { img: r12, name: "Vanessa G.", text: "Servir até o 44 mesmo, vestiu lindo" },
+  { img: r13, name: "Daniela H.", text: "Felpinha por dentro, parece carinho na pele" },
+  { img: r14, name: "Sabrina B.", text: "Não rasga fácil, tecido super resistente" },
+  { img: r15, name: "Larissa V.", text: "Levantou o bumbum, amei o efeito modelador" },
+  { img: r16, name: "Cristina N.", text: "Combina com vestido, saia, tudo. Indispensável" },
+  { img: r17, name: "Eduarda K.", text: "O forro felpudo é incrível, vale cada centavo" },
 ];
 
 export function CustomerReviewsCarousel() {
