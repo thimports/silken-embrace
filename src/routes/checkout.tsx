@@ -279,7 +279,7 @@ function CheckoutPage() {
                   <h2 className="font-display text-2xl md:text-3xl">Pagamento</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button onClick={() => setPay("pix")} className={`flex items-center gap-3 p-4 border transition-all ${pay === "pix" ? "border-foreground bg-foreground/[0.03]" : "border-border"}`}>
-                      <QrCode className="h-5 w-5 shrink-0" strokeWidth={1.5} />
+                      <img src={pixLogo} alt="PIX" className="h-5 w-5 shrink-0 object-contain" />
                       <div className="text-left min-w-0">
                         <div className="text-sm font-medium">PIX</div>
                         <div className="text-[11px] text-caramel">5% off</div>
