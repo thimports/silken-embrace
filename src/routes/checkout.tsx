@@ -5,6 +5,7 @@ import { Check, ChevronLeft, Lock, Shield, Truck, CreditCard, QrCode, RotateCcw,
 import { useServerFn } from "@tanstack/react-start";
 import { createPixTransaction, createCardTransaction } from "@/lib/primecash.functions";
 import { PixPayment } from "@/components/checkout/PixPayment";
+import { PaymentConfirmed } from "@/components/checkout/PaymentConfirmed";
 import hero from "@/assets/hero.webp";
 
 export const Route = createFileRoute("/checkout")({
@@ -51,6 +52,7 @@ function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
   const [pixTx, setPixTx] = useState<{ id: number; amount: number; pix: { qrcode: string; expirationDate?: string } } | null>(null);
   const [cardResult, setCardResult] = useState<{ status: string; refusedReason?: any } | null>(null);
+  const [paid, setPaid] = useState(false);
 
   const pixFn = useServerFn(createPixTransaction);
   const cardFn = useServerFn(createCardTransaction);
@@ -116,6 +118,7 @@ function CheckoutPage() {
           },
         }});
         setCardResult({ status: r.status, refusedReason: r.refusedReason });
+        if (r.status === "paid") setPaid(true);
       }
     } catch (e: any) {
       setError(e?.message || "Erro ao processar pagamento. Tente novamente.");
@@ -167,9 +170,13 @@ function CheckoutPage() {
         </div>
       </header>
 
-      {pixTx ? (
+      {paid ? (
         <div className="mx-auto max-w-[1280px] px-4 md:px-10 py-8 md:py-12">
-          <PixPayment transaction={pixTx} productTitle={PRODUCT_TITLE} productMeta={PRODUCT_META} />
+          <PaymentConfirmed />
+        </div>
+      ) : pixTx ? (
+        <div className="mx-auto max-w-[1280px] px-4 md:px-10 py-8 md:py-12">
+          <PixPayment transaction={pixTx} productTitle={PRODUCT_TITLE} productMeta={PRODUCT_META} onPaid={() => setPaid(true)} />
         </div>
       ) : (
       <>
