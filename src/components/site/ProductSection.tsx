@@ -125,7 +125,7 @@ export function ProductSection() {
               <span>Tamanho</span>
               <a href="#" className="text-foreground normal-case tracking-normal underline underline-offset-4">Guia de medidas</a>
             </div>
-            <div className="mt-3 grid grid-cols-3 gap-2">
+            <div className="mt-3 grid grid-cols-4 sm:grid-cols-7 gap-2">
               {SIZES.map((s) => (
                 <button
                   key={s}
