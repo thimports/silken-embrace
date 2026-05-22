@@ -35,7 +35,7 @@ export function Lookbook() {
               transition={{ duration: 0.8, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
               className="group"
             >
-              <div className="relative aspect-[3/4] overflow-hidden bg-background">
+              <div className="relative aspect-square overflow-hidden bg-background">
                 <img
                   src={l.src}
                   alt={l.t}
