@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Check, ChevronLeft, Lock, Shield, Truck, CreditCard, QrCode, Copy, CheckCircle2, RotateCcw } from "lucide-react";
+import { Check, ChevronLeft, Lock, Shield, Truck, CreditCard, QrCode, RotateCcw, Loader2, AlertCircle } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { createPixTransaction, createCardTransaction } from "@/lib/primecash.functions";
+import { PixPayment } from "@/components/checkout/PixPayment";
 import hero from "@/assets/hero.webp";
 
 export const Route = createFileRoute("/checkout")({
@@ -44,7 +47,13 @@ function CheckoutPage() {
   const [step, setStep] = useState(0);
   const [pay, setPay] = useState<"pix" | "card">("pix");
   const [cepLoading, setCepLoading] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pixTx, setPixTx] = useState<{ id: number; amount: number; pix: { qrcode: string; expirationDate?: string } } | null>(null);
+  const [cardResult, setCardResult] = useState<{ status: string; refusedReason?: any } | null>(null);
+
+  const pixFn = useServerFn(createPixTransaction);
+  const cardFn = useServerFn(createCardTransaction);
 
   // form state
   const [f, setF] = useState({
@@ -61,11 +70,58 @@ function CheckoutPage() {
   const shipping = 0;
   const discount = pay === "pix" ? subtotal * 0.05 : 0;
   const total = subtotal + shipping - discount;
+  const PRODUCT_TITLE = "2 Meia-Calça Forrada Térmica Translúcida · Lã Peluciada Plus";
+  const PRODUCT_META = "Cor: Nude · Tam. Único · Qtd: 1";
 
-  const copyPix = () => {
-    navigator.clipboard.writeText("00020126360014BR.GOV.BCB.PIX0114lumiere@pix5204000053039865406" + total.toFixed(2));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const buildCustomer = () => ({ name: f.name, email: f.email, phone: f.phone, document: f.cpf });
+  const buildAddress = () => ({
+    street: f.street, streetNumber: f.number, complement: f.complement,
+    zipCode: f.cep, city: f.city, state: f.state,
+  });
+  const buildItems = () => ([{ title: PRODUCT_TITLE, unitPrice: Math.round(subtotal * 100), quantity: 1, tangible: true }]);
+
+  const handleFinish = async () => {
+    setError(null);
+    if (!f.name || !f.email || !f.cpf || !f.phone) {
+      setStep(0); setError("Preencha seus dados antes de pagar."); return;
+    }
+    if (!f.cep || !f.street || !f.number || !f.city || !f.state) {
+      setStep(1); setError("Preencha o endereço de entrega."); return;
+    }
+    setSubmitting(true);
+    try {
+      if (pay === "pix") {
+        const tx = await pixFn({ data: {
+          amount: Math.round(total * 100),
+          customer: buildCustomer(),
+          items: buildItems(),
+          address: buildAddress(),
+        }});
+        if (!tx?.pix?.qrcode) throw new Error("Não recebemos o código PIX. Tente novamente.");
+        setPixTx({ id: tx.id, amount: tx.amount, pix: tx.pix });
+      } else {
+        const [mm, yy] = f.cardExp.split("/");
+        const r = await cardFn({ data: {
+          amount: Math.round(total * 100),
+          installments: parseInt(f.installments, 10) || 1,
+          customer: buildCustomer(),
+          items: buildItems(),
+          address: buildAddress(),
+          card: {
+            number: f.cardNum,
+            holderName: f.cardName,
+            expirationMonth: parseInt(mm || "0", 10),
+            expirationYear: 2000 + parseInt(yy || "0", 10),
+            cvv: f.cardCvc,
+          },
+        }});
+        setCardResult({ status: r.status, refusedReason: r.refusedReason });
+      }
+    } catch (e: any) {
+      setError(e?.message || "Erro ao processar pagamento. Tente novamente.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const lookupCep = async (rawCep: string) => {
@@ -110,6 +166,14 @@ function CheckoutPage() {
           </div>
         </div>
       </header>
+
+      {pixTx ? (
+        <div className="mx-auto max-w-[1280px] px-4 md:px-10 py-8 md:py-12">
+          <PixPayment transaction={pixTx} productTitle={PRODUCT_TITLE} productMeta={PRODUCT_META} />
+        </div>
+      ) : (
+      <>
+
 
 
       <div className="mx-auto max-w-[1280px] grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-8 lg:gap-10 px-4 md:px-10 py-6 md:py-10 lg:py-16">
@@ -199,11 +263,8 @@ function CheckoutPage() {
 
                   <AnimatePresence mode="wait">
                     {pay === "pix" ? (
-                      <motion.div key="pix" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="border border-border p-6 text-center">
-                        <p className="text-sm text-muted-foreground">Clique abaixo para copiar o código PIX e pagar no app do seu banco.</p>
-                        <button onClick={copyPix} className="mt-4 inline-flex items-center gap-2 border border-border px-4 py-2.5 text-xs tracking-luxe uppercase hover:bg-foreground hover:text-background transition-all">
-                          {copied ? <><CheckCircle2 className="h-4 w-4" strokeWidth={1.5} /> Copiado</> : <><Copy className="h-4 w-4" strokeWidth={1.5} /> Copiar código PIX</>}
-                        </button>
+                      <motion.div key="pix" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="border border-border p-5 bg-secondary/40 text-sm text-foreground/80">
+                        Ao finalizar, geraremos um QR Code PIX para você pagar no app do seu banco. A confirmação é instantânea.
                       </motion.div>
                     ) : (
                       <motion.div key="card" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-4">
@@ -221,6 +282,12 @@ function CheckoutPage() {
                             ))}
                           </select>
                         </label>
+                        {cardResult && cardResult.status !== "paid" && (
+                          <div className="flex items-start gap-2 bg-destructive/10 border border-destructive/30 text-destructive p-3 text-sm">
+                            <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                            <span>Pagamento recusado{cardResult.refusedReason?.message ? `: ${cardResult.refusedReason.message}` : ". Verifique os dados do cartão."}</span>
+                          </div>
+                        )}
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -229,8 +296,15 @@ function CheckoutPage() {
             </motion.div>
           </AnimatePresence>
 
+          {error && (
+            <div className="mt-4 flex items-start gap-2 bg-destructive/10 border border-destructive/30 text-destructive p-3 text-sm">
+              <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
           <div className="mt-6 flex items-center justify-between gap-3">
-            <button onClick={back} disabled={step === 0} className="inline-flex items-center gap-1.5 px-2 sm:px-4 py-3 text-[12px] tracking-luxe uppercase text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed shrink-0">
+            <button onClick={back} disabled={step === 0 || submitting} className="inline-flex items-center gap-1.5 px-2 sm:px-4 py-3 text-[12px] tracking-luxe uppercase text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed shrink-0">
               <ChevronLeft className="h-4 w-4" strokeWidth={1.5} /> Voltar
             </button>
             {step < 2 ? (
@@ -238,8 +312,8 @@ function CheckoutPage() {
                 Continuar
               </button>
             ) : (
-              <button className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-foreground text-background px-6 sm:px-8 py-4 text-[12px] tracking-luxe uppercase hover:bg-foreground/90">
-                <Lock className="h-4 w-4" strokeWidth={1.5} /> Finalizar compra
+              <button onClick={handleFinish} disabled={submitting} className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-foreground text-background px-6 sm:px-8 py-4 text-[12px] tracking-luxe uppercase hover:bg-foreground/90 disabled:opacity-60">
+                {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Processando…</> : <><Lock className="h-4 w-4" strokeWidth={1.5} /> {pay === "pix" ? "Gerar PIX" : "Finalizar compra"}</>}
               </button>
             )}
           </div>
@@ -291,6 +365,8 @@ function CheckoutPage() {
           </div>
         </aside>
       </div>
+      </>
+      )}
     </div>
   );
 }
