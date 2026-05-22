@@ -256,8 +256,14 @@ function CheckoutPage() {
     setSubmitting(true);
     try {
       if (pay === "pix") {
-        // Reuse pre-warmed PIX if signature still matches
+        // 1) Reuse pre-warmed PIX if signature still matches
         let tx = (pixTx && lastSigRef.current === pixSig) ? pixTx : null;
+        // 2) Otherwise, wait for in-flight prewarm
+        if (!tx && pixPromiseRef.current) {
+          const pending = await pixPromiseRef.current.catch(() => null);
+          if (pending && lastSigRef.current === pixSig) tx = pending;
+        }
+        // 3) Last resort: generate now with retry
         if (!tx) {
           const fresh = await withRetry(() => pixFn({ data: {
             amount: Math.round(total * 100),
