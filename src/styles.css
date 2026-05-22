@@ -128,3 +128,10 @@
   }
   .animate-marquee { animation: marquee 35s linear infinite; }
 }
+
+/* Prevent iOS auto-zoom on input focus (fonts < 16px trigger zoom) */
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}

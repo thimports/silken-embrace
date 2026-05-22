@@ -74,7 +74,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" },
       { title: "Lumiére" },
       { name: "description", content: "Elegance Flow is a premium e-commerce application for a single product, offering a sophisticated and modern shopping experience." },
       { name: "author", content: "Lovable" },
