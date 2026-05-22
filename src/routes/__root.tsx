@@ -82,8 +82,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Lumiére" },
       { name: "twitter:description", content: "Elegance Flow is a premium e-commerce application for a single product, offering a sophisticated and modern shopping experience." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/246700e4-97e2-4424-8578-948ae25728ae/id-preview-b14b00e9--e7b60fd8-ced4-436d-aeef-e9c2dde5cfcb.lovable.app-1779417308532.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/246700e4-97e2-4424-8578-948ae25728ae/id-preview-b14b00e9--e7b60fd8-ced4-436d-aeef-e9c2dde5cfcb.lovable.app-1779417308532.png" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/YOv8m9ZQbKUSGKpKAN6edaMcibw1/social-images/social-1779425090129-ChatGPT_Image_22_de_mai._de_2026,_00_58_33.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/YOv8m9ZQbKUSGKpKAN6edaMcibw1/social-images/social-1779425090129-ChatGPT_Image_22_de_mai._de_2026,_00_58_33.webp" },
     ],
     links: [
       {
