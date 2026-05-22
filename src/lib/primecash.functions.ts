@@ -98,15 +98,25 @@ export const createPixTransaction = createServerFn({ method: "POST" })
       pix: { expiresInDays: 1 },
     };
     const tx = await callPrimecash(body);
+    const pix = tx?.pix || tx?.pixData || {};
+    const qrcode =
+      pix.qrcode || pix.qrCode || pix.qr_code ||
+      pix.emv || pix.copyPaste || pix.copy_paste ||
+      pix.payload || tx?.qrcode || tx?.qrCode || null;
+    const expirationDate =
+      pix.expirationDate || pix.expiration_date || pix.expiresAt || pix.expires_at || null;
+
+    if (!qrcode) {
+      console.error("Prime Cash retornou sem QR code:", JSON.stringify(tx).slice(0, 2000));
+      throw new Error("Pagamento PIX indisponível no momento. Tente novamente em instantes.");
+    }
+
     return {
       id: tx.id,
       secureId: tx.secureId,
       status: tx.status,
       amount: tx.amount,
-      pix: {
-        qrcode: tx?.pix?.qrcode as string,
-        expirationDate: tx?.pix?.expirationDate as string | undefined,
-      },
+      pix: { qrcode, expirationDate },
     };
   });
 
