@@ -129,9 +129,9 @@ function CheckoutPage() {
                   <h2 className="font-display text-2xl md:text-3xl">Seus dados</h2>
                   <Field label="Nome completo" value={f.name} onChange={set("name")} placeholder="Maria Silva" />
                   <Field label="Email" type="email" value={f.email} onChange={set("email")} placeholder="maria@exemplo.com" />
-                  <div className="grid grid-cols-2 gap-4">
-                    <Field label="Celular" value={f.phone} onChange={(e) => setF({ ...f, phone: mask(e.target.value, maskPhone) })} placeholder="(11) 99999-0000" />
-                    <Field label="CPF" value={f.cpf} onChange={(e) => setF({ ...f, cpf: mask(e.target.value, maskCpf) })} placeholder="000.000.000-00" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Field label="Celular" type="tel" inputMode="numeric" value={f.phone} onChange={(e) => setF({ ...f, phone: mask(e.target.value, maskPhone) })} placeholder="(11) 99999-0000" />
+                    <Field label="CPF" inputMode="numeric" value={f.cpf} onChange={(e) => setF({ ...f, cpf: mask(e.target.value, maskCpf) })} placeholder="000.000.000-00" />
                   </div>
                 </div>
               )}
