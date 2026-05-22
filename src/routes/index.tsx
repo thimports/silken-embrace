@@ -46,7 +46,7 @@ function Index() {
         <Lookbook />
         <Testimonials />
         <Faq />
-        <TrustBar />
+        
       </main>
       <Footer />
       <MobileBuyBar />
