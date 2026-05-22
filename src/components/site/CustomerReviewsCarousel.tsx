@@ -45,12 +45,12 @@ export function CustomerReviewsCarousel() {
         Meia-Calça Forrada Térmica Lumière
       </h3>
 
-      <div className="mt-5 -mx-5 md:mx-0">
-        <div className="flex gap-3 overflow-x-auto no-scrollbar snap-x snap-mandatory px-5 md:px-0 pb-2">
-          {REVIEWS.map((r, i) => (
+      <div className="mt-5 -mx-5 md:mx-0 overflow-hidden group">
+        <div className="flex gap-3 w-max animate-marquee group-hover:[animation-play-state:paused]">
+          {[...REVIEWS, ...REVIEWS].map((r, i) => (
             <article
               key={i}
-              className="snap-start shrink-0 w-[160px] md:w-[180px] bg-cream border border-border shadow-soft overflow-hidden"
+              className="shrink-0 w-[160px] md:w-[180px] bg-cream border border-border shadow-soft overflow-hidden"
             >
               <div className="aspect-[3/4] overflow-hidden bg-secondary/60">
                 <img
