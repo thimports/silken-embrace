@@ -10,6 +10,7 @@ import { Faq } from "@/components/site/Faq";
 
 import { Footer } from "@/components/site/Footer";
 import { MobileBuyBar } from "@/components/site/MobileBuyBar";
+import lcpImage from "@/assets/product-lifestyle.webp";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -28,8 +29,9 @@ export const Route = createFileRoute("/")({
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&display=swap",
       },
+      { rel: "preload", as: "image", href: lcpImage, fetchpriority: "high" },
     ],
   }),
   component: Index,

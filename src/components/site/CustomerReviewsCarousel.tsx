@@ -16,8 +16,8 @@ import r14 from "@/assets/reviews/r14.jpg";
 import r15 from "@/assets/reviews/r15.jpg";
 import r16 from "@/assets/reviews/r16.jpg";
 import r17 from "@/assets/reviews/r17.jpg";
-import r18 from "@/assets/reviews/r18.jpg";
-import r19 from "@/assets/reviews/r19.jpg";
+import r18 from "@/assets/reviews/r18.webp";
+import r19 from "@/assets/reviews/r19.webp";
 
 const REVIEWS = [
   { img: r1, name: "Mariana A.", text: "Aquece muito, super confortável. Amei!" },
