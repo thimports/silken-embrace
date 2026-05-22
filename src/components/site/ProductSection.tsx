@@ -19,7 +19,6 @@ export function ProductSection() {
   const [size, setSize] = useState(SIZES[0]);
   const [color, setColor] = useState(COLORS[0].name);
   const [qty, setQty] = useState(1);
-  const [loaded, setLoaded] = useState(false);
   const [viewers, setViewers] = useState(22);
   const [stock, setStock] = useState(11);
 
@@ -27,10 +26,6 @@ export function ProductSection() {
     setViewers(14 + Math.floor(Math.random() * 22));
     setStock(8 + Math.floor(Math.random() * 7));
   }, []);
-
-  useEffect(() => {
-    setLoaded(false);
-  }, [img]);
 
   return (
     <section id="detalhes" className="border-t border-border/60 bg-background">
