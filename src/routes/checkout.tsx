@@ -128,9 +128,14 @@ function CheckoutPage() {
         }});
         if (!tx?.pix?.qrcode) throw new Error("Não recebemos o código PIX. Tente novamente.");
         setPixTx({ id: tx.id, amount: tx.amount, pix: tx.pix });
+
+        const createdAt = utcNow();
+        const orderId = String(tx.id);
+        setOrderCtx({ orderId, createdAt });
+
         // Track Purchase as soon as PIX is generated (per requirement)
         const eventId = `purchase-pix-${tx.id}`;
-        fbTrack("Purchase", { value: total, currency: "BRL", content_ids: ["lumiere-meia-2pk"], content_type: "product", order_id: String(tx.id) }, { eventID: eventId });
+        fbTrack("Purchase", { value: total, currency: "BRL", content_ids: ["lumiere-meia-2pk"], content_type: "product", order_id: orderId }, { eventID: eventId });
         capiFn({ data: {
           eventName: "Purchase",
           eventId,
@@ -140,8 +145,14 @@ function CheckoutPage() {
           fbp: getFbp(),
           fbc: getFbc(),
           user: { email: f.email, phone: f.phone, name: f.name, cpf: f.cpf, city: f.city, state: f.state, zip: f.cep },
-          customData: { order_id: String(tx.id), payment_method: "pix" },
+          customData: { order_id: orderId, payment_method: "pix" },
         }}).catch(() => {});
+
+        // Utmify: PIX gerado (waiting_payment)
+        utmifyFn({ data: buildUtmifyOrder({
+          orderId, createdAt, status: "waiting_payment", paymentMethod: "pix",
+          approvedDate: null,
+        }) }).catch(() => {});
       } else {
         const [mm, yy] = f.cardExp.split("/");
         const r = await cardFn({ data: {
@@ -159,9 +170,12 @@ function CheckoutPage() {
           },
         }});
         setCardResult({ status: r.status, refusedReason: r.refusedReason });
+        const createdAt = utcNow();
+        const orderId = String(r.id ?? r.secureId ?? Date.now());
+
         if (r.status === "paid") {
           setPaid(true);
-          const eventId = `purchase-card-${r.id ?? Date.now()}`;
+          const eventId = `purchase-card-${orderId}`;
           fbTrack("Purchase", { value: total, currency: "BRL", content_ids: ["lumiere-meia-2pk"], content_type: "product" }, { eventID: eventId });
           capiFn({ data: {
             eventName: "Purchase",
@@ -174,6 +188,16 @@ function CheckoutPage() {
             user: { email: f.email, phone: f.phone, name: f.name, cpf: f.cpf, city: f.city, state: f.state, zip: f.cep },
             customData: { payment_method: "credit_card" },
           }}).catch(() => {});
+
+          utmifyFn({ data: buildUtmifyOrder({
+            orderId, createdAt, status: "paid", paymentMethod: "credit_card",
+            approvedDate: createdAt,
+          }) }).catch(() => {});
+        } else {
+          utmifyFn({ data: buildUtmifyOrder({
+            orderId, createdAt, status: "refused", paymentMethod: "credit_card",
+            approvedDate: null,
+          }) }).catch(() => {});
         }
       }
     } catch (e: any) {
