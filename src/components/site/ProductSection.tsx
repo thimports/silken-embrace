@@ -54,9 +54,6 @@ export function ProductSection() {
               className={`relative max-h-full max-w-full w-auto h-auto object-contain lg:h-full lg:w-full lg:object-cover transition-all duration-700 ${loaded ? "opacity-100" : "opacity-0"} group-hover:lg:scale-105`}
               loading="lazy"
             />
-            <span className="absolute top-4 left-4 bg-background/90 backdrop-blur px-3 py-1 text-[10px] tracking-luxe uppercase z-10">
-              Edição inverno
-            </span>
           </motion.div>
 
           <div className="flex lg:flex-col gap-3 order-2 lg:order-1 overflow-x-auto no-scrollbar lg:overflow-visible -mx-1 px-1">
