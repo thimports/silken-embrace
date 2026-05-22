@@ -109,6 +109,53 @@ function CheckoutPage() {
   });
   const buildItems = () => ([{ title: PRODUCT_TITLE, unitPrice: Math.round(subtotal * 100), quantity: 1, tangible: true }]);
 
+  const utcNow = () => {
+    const d = new Date();
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
+  };
+
+  const buildUtmifyOrder = (opts: {
+    orderId: string;
+    createdAt: string;
+    status: "waiting_payment" | "paid" | "refused" | "refunded" | "chargedback";
+    paymentMethod: "pix" | "credit_card";
+    approvedDate: string | null;
+    refundedAt?: string | null;
+  }) => {
+    const totalCents = Math.round(total * 100);
+    return {
+      orderId: opts.orderId,
+      paymentMethod: opts.paymentMethod,
+      status: opts.status,
+      createdAt: opts.createdAt,
+      approvedDate: opts.approvedDate,
+      refundedAt: opts.refundedAt ?? null,
+      customer: {
+        name: f.name,
+        email: f.email,
+        phone: onlyDigits(f.phone) || null,
+        document: onlyDigits(f.cpf) || null,
+        country: "BR",
+      },
+      products: [{
+        id: "lumiere-meia-2pk",
+        name: PRODUCT_TITLE,
+        planId: null,
+        planName: null,
+        quantity: 1,
+        priceInCents: Math.round(subtotal * 100),
+      }],
+      trackingParameters: getUtms(),
+      commission: {
+        totalPriceInCents: totalCents,
+        gatewayFeeInCents: 0,
+        userCommissionInCents: totalCents,
+        currency: "BRL" as const,
+      },
+    };
+  };
+
   const handleFinish = async () => {
     setError(null);
     if (!f.name || !f.email || !f.cpf || !f.phone) {
