@@ -7,8 +7,9 @@ import lifestyle from "@/assets/product-lifestyle.webp";
 import p1 from "@/assets/product-1.webp";
 import p2 from "@/assets/product-2.webp";
 import look from "@/assets/lookbook-2.webp";
+import paris from "@/assets/product-paris.png";
 
-const IMAGES = [lifestyle, hero, p1, p2, look];
+const IMAGES = [lifestyle, hero, p1, p2, paris, look];
 const COLORS = [
   { name: "Nude", value: "oklch(0.82 0.04 65)" },
   { name: "Café", value: "oklch(0.42 0.04 50)" },
