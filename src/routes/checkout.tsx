@@ -365,6 +365,8 @@ function CheckoutPage() {
           </div>
         </aside>
       </div>
+      </>
+      )}
     </div>
   );
 }
