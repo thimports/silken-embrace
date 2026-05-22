@@ -62,9 +62,9 @@ function CheckoutPage() {
   const next = () => setStep((s) => Math.min(2, s + 1));
   const back = () => setStep((s) => Math.max(0, s - 1));
 
-  const subtotal = 89.9;
+  const subtotal = 79.9;
   const shipping = 0;
-  const discount = pay === "pix" ? subtotal * 0.1 : 0;
+  const discount = pay === "pix" ? subtotal * 0.05 : 0;
   const total = subtotal + shipping - discount;
 
   const copyPix = () => {
@@ -159,7 +159,7 @@ function CheckoutPage() {
                       <QrCode className="h-5 w-5" strokeWidth={1.5} />
                       <div className="text-left">
                         <div className="text-sm font-medium">PIX</div>
-                        <div className="text-[11px] text-caramel">10% off</div>
+                        <div className="text-[11px] text-caramel">5% off</div>
                       </div>
                     </button>
                     <button onClick={() => setPay("card")} className={`flex items-center gap-3 p-4 border transition-all ${pay === "card" ? "border-foreground bg-foreground/[0.03]" : "border-border"}`}>
@@ -240,14 +240,14 @@ function CheckoutPage() {
                 <div className="text-[13px] font-medium leading-snug">Meia-Calça Forrada Térmica Translúcida · Lã Peluciada Plus</div>
                 <div className="mt-1 text-xs text-muted-foreground">Cor: Nude · Tamanho: G/GG · Qtd: 1</div>
               </div>
-              <div className="font-display text-base">R$ 89,90</div>
+              <div className="font-display text-base">R$ 79,90</div>
             </div>
 
             <div className="mt-6 pt-6 border-t border-border space-y-2.5 text-sm">
               <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>R$ {subtotal.toFixed(2).replace(".", ",")}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Frete</span><span className="text-caramel">Grátis</span></div>
               {discount > 0 && (
-                <div className="flex justify-between"><span className="text-muted-foreground">Desconto PIX (10%)</span><span className="text-caramel">- R$ {discount.toFixed(2).replace(".", ",")}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Desconto PIX (5%)</span><span className="text-caramel">- R$ {discount.toFixed(2).replace(".", ",")}</span></div>
               )}
             </div>
 

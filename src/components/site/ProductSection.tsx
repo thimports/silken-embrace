@@ -78,13 +78,13 @@ export function ProductSection() {
           </div>
 
           <div className="mt-7 flex items-end gap-3">
-            <span className="font-display text-4xl text-foreground">R$ 89<span className="text-xl">,90</span></span>
+            <span className="font-display text-4xl text-foreground">R$ 79<span className="text-xl">,90</span></span>
             <span className="text-muted-foreground line-through text-base mb-1">R$ 179,90</span>
             <span className="mb-1 bg-foreground text-background text-[11px] tracking-luxe uppercase px-2 py-1">-50%</span>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
-            ou <span className="text-foreground font-medium">12x de R$ 8,90</span> sem juros · 
-            <span className="text-foreground font-medium"> R$ 80,91</span> no PIX (10% off)
+            ou <span className="text-foreground font-medium">12x de R$ 7,90</span> sem juros · 
+            <span className="text-foreground font-medium"> R$ 75,91</span> no PIX (5% off)
           </p>
 
           <div className="mt-7 flex items-center gap-2 text-[13px] text-foreground/80 bg-secondary/50 border border-border/60 px-4 py-3">

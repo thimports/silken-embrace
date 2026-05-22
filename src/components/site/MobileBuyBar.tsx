@@ -6,7 +6,7 @@ export function MobileBuyBar() {
       <div className="flex-1">
         <div className="text-[10px] tracking-luxe uppercase text-muted-foreground">Hoje por</div>
         <div className="font-display text-lg leading-none mt-0.5">
-          R$ 89,90 <span className="text-xs text-muted-foreground line-through">R$ 179,90</span>
+          R$ 79,90 <span className="text-xs text-muted-foreground line-through">R$ 179,90</span>
         </div>
       </div>
       <Link
