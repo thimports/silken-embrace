@@ -159,7 +159,7 @@ function CheckoutPage() {
                       <QrCode className="h-5 w-5" strokeWidth={1.5} />
                       <div className="text-left">
                         <div className="text-sm font-medium">PIX</div>
-                        <div className="text-[11px] text-caramel">10% off</div>
+                        <div className="text-[11px] text-caramel">5% off</div>
                       </div>
                     </button>
                     <button onClick={() => setPay("card")} className={`flex items-center gap-3 p-4 border transition-all ${pay === "card" ? "border-foreground bg-foreground/[0.03]" : "border-border"}`}>
