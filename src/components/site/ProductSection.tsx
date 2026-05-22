@@ -140,21 +140,6 @@ export function ProductSection() {
 
           <CustomerReviewsCarousel />
 
-          {/* Trust */}
-          <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-border/60">
-            {[
-              { I: Truck, t: "Frete rápido", s: "Envio em 24h" },
-              { I: Shield, t: "Garantia", s: "30 dias" },
-              { I: RotateCcw, t: "Troca grátis", s: "Sem burocracia" },
-              { I: Lock, t: "Compra segura", s: "SSL 256-bit" },
-            ].map(({ I, t, s }) => (
-              <div key={t} className="text-center">
-                <I className="h-5 w-5 mx-auto text-foreground/70" strokeWidth={1.25} />
-                <div className="mt-2 text-[12px] font-medium">{t}</div>
-                <div className="text-[11px] text-muted-foreground">{s}</div>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </section>
