@@ -193,22 +193,27 @@ function CheckoutPage() {
     if (prewarming) return;
 
     let cancelled = false;
-    const t = setTimeout(async () => {
+    const t = setTimeout(() => {
       setPrewarming(true);
-      try {
-        const tx = await withRetry(() => pixFn({ data: {
-          amount: Math.round(total * 100),
-          customer: buildCustomer(),
-          items: buildItems(),
-          address: buildAddress(),
-        }}), 3, 600);
-        if (cancelled) return;
-        if (tx?.pix?.qrcode) {
-          setPixTx({ id: tx.id, amount: tx.amount, pix: tx.pix });
-          lastSigRef.current = pixSig;
-        }
-      } catch { /* silent — handleFinish will retry */ }
-      finally { if (!cancelled) setPrewarming(false); }
+      const p = withRetry(() => pixFn({ data: {
+        amount: Math.round(total * 100),
+        customer: buildCustomer(),
+        items: buildItems(),
+        address: buildAddress(),
+      }}), 3, 600)
+        .then((tx) => {
+          if (cancelled) return null;
+          if (tx?.pix?.qrcode) {
+            const out = { id: tx.id, amount: tx.amount, pix: tx.pix };
+            setPixTx(out);
+            lastSigRef.current = pixSig;
+            return out;
+          }
+          return null;
+        })
+        .catch(() => null)
+        .finally(() => { if (!cancelled) setPrewarming(false); });
+      pixPromiseRef.current = p;
     }, 700);
 
     return () => { cancelled = true; clearTimeout(t); };
