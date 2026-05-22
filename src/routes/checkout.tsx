@@ -133,13 +133,13 @@ function CheckoutPage() {
           </div>
 
 
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={step}
-              initial={{ opacity: 0, x: 16 }}
+              initial={{ opacity: 0, x: 8 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -16 }}
-              transition={{ duration: 0.35 }}
+              exit={{ opacity: 0, x: -8 }}
+              transition={{ duration: 0.15 }}
               className="bg-background border border-border p-5 md:p-10 shadow-soft"
             >
               {step === 0 && (
