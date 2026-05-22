@@ -111,7 +111,7 @@ export function ProductSection() {
             <div className="text-[12px] tracking-luxe uppercase text-muted-foreground">
               <span>Tamanho</span>
             </div>
-            <div className="mt-3 inline-flex items-baseline gap-2 border border-foreground bg-foreground text-background px-4 py-2.5">
+            <div className="mt-3 inline-flex items-baseline gap-2 px-4 py-2.5 text-background" style={{ backgroundColor: "#B5825F", borderColor: "#B5825F" }}>
               <span className="text-xs tracking-luxe uppercase">Tamanho Único</span>
               <span className="text-[11px] opacity-80">veste do 34 ao 44</span>
             </div>
