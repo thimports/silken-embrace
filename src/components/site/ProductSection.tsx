@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { Star, Minus, Plus, Shield, Truck, RotateCcw, Lock, Eye, Flame } from "lucide-react";
+import { Star, Shield, Truck, RotateCcw, Lock, Eye } from "lucide-react";
 import hero from "@/assets/hero.webp";
 import p1 from "@/assets/product-1.webp";
 import p2 from "@/assets/product-2.webp";
 import look from "@/assets/lookbook-2.webp";
 
 const IMAGES = [hero, p1, p2, look];
-const SIZES = ["PP", "P", "M", "G", "GG", "G1", "G2"];
 const COLORS = [
   { name: "Nude", value: "oklch(0.82 0.04 65)" },
   { name: "Café", value: "oklch(0.42 0.04 50)" },
@@ -16,15 +15,11 @@ const COLORS = [
 
 export function ProductSection() {
   const [img, setImg] = useState(0);
-  const [size, setSize] = useState(SIZES[0]);
   const [color, setColor] = useState(COLORS[0].name);
-  const [qty, setQty] = useState(1);
   const [viewers, setViewers] = useState(22);
-  const [stock, setStock] = useState(11);
 
   useEffect(() => {
     setViewers(14 + Math.floor(Math.random() * 22));
-    setStock(8 + Math.floor(Math.random() * 7));
   }, []);
 
   return (
@@ -117,16 +112,9 @@ export function ProductSection() {
               <span>Tamanho</span>
               <a href="#" className="text-foreground normal-case tracking-normal underline underline-offset-4">Guia de medidas</a>
             </div>
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {SIZES.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setSize(s)}
-                  className={`min-w-[44px] px-3 py-2 text-xs tracking-wide border transition-all ${size === s ? "border-foreground bg-foreground text-background" : "border-border hover:border-foreground/60"}`}
-                >
-                  {s}
-                </button>
-              ))}
+            <div className="mt-3 inline-flex items-baseline gap-2 border border-foreground bg-foreground text-background px-4 py-2.5">
+              <span className="text-xs tracking-luxe uppercase">Tamanho Único</span>
+              <span className="text-[11px] opacity-80">veste do 34 ao 44</span>
             </div>
           </div>
 
