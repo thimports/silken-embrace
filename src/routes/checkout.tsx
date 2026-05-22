@@ -231,7 +231,7 @@ function CheckoutPage() {
 
 
           <div className="mt-8 grid grid-cols-3 gap-4 text-center text-[11px] tracking-luxe uppercase text-muted-foreground">
-            <div className="flex flex-col items-center gap-2"><Lock className="h-4 w-4" strokeWidth={1.5} /> SSL 256-bit</div>
+            <div className="flex flex-col items-center gap-2"><RotateCcw className="h-4 w-4" strokeWidth={1.5} /> Devolução em 7d</div>
             <div className="flex flex-col items-center gap-2"><Shield className="h-4 w-4" strokeWidth={1.5} /> Garantia 30d</div>
             <div className="flex flex-col items-center gap-2"><Truck className="h-4 w-4" strokeWidth={1.5} /> Envio em 24h</div>
           </div>
