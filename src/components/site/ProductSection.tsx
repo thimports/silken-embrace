@@ -44,6 +44,9 @@ export function ProductSection() {
               className="relative h-full w-full object-cover transition-transform duration-700 group-hover:lg:scale-105"
               loading="eager"
               decoding="async"
+              fetchPriority="high"
+              width={1080}
+              height={1350}
             />
           </motion.div>
 
