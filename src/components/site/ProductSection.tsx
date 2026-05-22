@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { Star, Shield, Truck, RotateCcw, Lock, Eye } from "lucide-react";
 import { CustomerReviewsCarousel } from "./CustomerReviewsCarousel";
+import { fbTrack } from "@/lib/fbpixel";
 import hero from "@/assets/hero.webp";
 import lifestyle from "@/assets/product-lifestyle.webp";
 import p1 from "@/assets/product-1.webp";
