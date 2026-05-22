@@ -240,7 +240,7 @@ function CheckoutPage() {
                 <div className="text-[13px] font-medium leading-snug">Meia-Calça Forrada Térmica Translúcida · Lã Peluciada Plus</div>
                 <div className="mt-1 text-xs text-muted-foreground">Cor: Nude · Tamanho: G/GG · Qtd: 1</div>
               </div>
-              <div className="font-display text-base">R$ 89,90</div>
+              <div className="font-display text-base">R$ 79,90</div>
             </div>
 
             <div className="mt-6 pt-6 border-t border-border space-y-2.5 text-sm">
