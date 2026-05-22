@@ -255,11 +255,8 @@ function CheckoutPage() {
 
                   <AnimatePresence mode="wait">
                     {pay === "pix" ? (
-                      <motion.div key="pix" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="border border-border p-6 text-center">
-                        <p className="text-sm text-muted-foreground">Clique abaixo para copiar o código PIX e pagar no app do seu banco.</p>
-                        <button onClick={copyPix} className="mt-4 inline-flex items-center gap-2 border border-border px-4 py-2.5 text-xs tracking-luxe uppercase hover:bg-foreground hover:text-background transition-all">
-                          {copied ? <><CheckCircle2 className="h-4 w-4" strokeWidth={1.5} /> Copiado</> : <><Copy className="h-4 w-4" strokeWidth={1.5} /> Copiar código PIX</>}
-                        </button>
+                      <motion.div key="pix" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="border border-border p-5 bg-secondary/40 text-sm text-foreground/80">
+                        Ao finalizar, geraremos um QR Code PIX para você pagar no app do seu banco. A confirmação é instantânea.
                       </motion.div>
                     ) : (
                       <motion.div key="card" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-4">
@@ -277,6 +274,12 @@ function CheckoutPage() {
                             ))}
                           </select>
                         </label>
+                        {cardResult && cardResult.status !== "paid" && (
+                          <div className="flex items-start gap-2 bg-destructive/10 border border-destructive/30 text-destructive p-3 text-sm">
+                            <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                            <span>Pagamento recusado{cardResult.refusedReason?.message ? `: ${cardResult.refusedReason.message}` : ". Verifique os dados do cartão."}</span>
+                          </div>
+                        )}
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -285,8 +288,15 @@ function CheckoutPage() {
             </motion.div>
           </AnimatePresence>
 
+          {error && (
+            <div className="mt-4 flex items-start gap-2 bg-destructive/10 border border-destructive/30 text-destructive p-3 text-sm">
+              <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
           <div className="mt-6 flex items-center justify-between gap-3">
-            <button onClick={back} disabled={step === 0} className="inline-flex items-center gap-1.5 px-2 sm:px-4 py-3 text-[12px] tracking-luxe uppercase text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed shrink-0">
+            <button onClick={back} disabled={step === 0 || submitting} className="inline-flex items-center gap-1.5 px-2 sm:px-4 py-3 text-[12px] tracking-luxe uppercase text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed shrink-0">
               <ChevronLeft className="h-4 w-4" strokeWidth={1.5} /> Voltar
             </button>
             {step < 2 ? (
@@ -294,8 +304,8 @@ function CheckoutPage() {
                 Continuar
               </button>
             ) : (
-              <button className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-foreground text-background px-6 sm:px-8 py-4 text-[12px] tracking-luxe uppercase hover:bg-foreground/90">
-                <Lock className="h-4 w-4" strokeWidth={1.5} /> Finalizar compra
+              <button onClick={handleFinish} disabled={submitting} className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-foreground text-background px-6 sm:px-8 py-4 text-[12px] tracking-luxe uppercase hover:bg-foreground/90 disabled:opacity-60">
+                {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Processando…</> : <><Lock className="h-4 w-4" strokeWidth={1.5} /> {pay === "pix" ? "Gerar PIX" : "Finalizar compra"}</>}
               </button>
             )}
           </div>
