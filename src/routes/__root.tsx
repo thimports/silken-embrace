@@ -72,14 +72,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Lumiére" },
+      { name: "description", content: "Elegance Flow is a premium e-commerce application for a single product, offering a sophisticated and modern shopping experience." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Lumiére" },
+      { property: "og:description", content: "Elegance Flow is a premium e-commerce application for a single product, offering a sophisticated and modern shopping experience." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Lumiére" },
+      { name: "twitter:description", content: "Elegance Flow is a premium e-commerce application for a single product, offering a sophisticated and modern shopping experience." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/246700e4-97e2-4424-8578-948ae25728ae/id-preview-b14b00e9--e7b60fd8-ced4-436d-aeef-e9c2dde5cfcb.lovable.app-1779417308532.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/246700e4-97e2-4424-8578-948ae25728ae/id-preview-b14b00e9--e7b60fd8-ced4-436d-aeef-e9c2dde5cfcb.lovable.app-1779417308532.png" },
     ],
     links: [
       {
