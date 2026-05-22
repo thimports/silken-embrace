@@ -19,7 +19,6 @@ export function ProductSection() {
   const [size, setSize] = useState(SIZES[0]);
   const [color, setColor] = useState(COLORS[0].name);
   const [qty, setQty] = useState(1);
-  const [loaded, setLoaded] = useState(false);
   const [viewers, setViewers] = useState(22);
   const [stock, setStock] = useState(11);
 
@@ -28,10 +27,6 @@ export function ProductSection() {
     setStock(8 + Math.floor(Math.random() * 7));
   }, []);
 
-  useEffect(() => {
-    setLoaded(false);
-  }, [img]);
-
   return (
     <section id="detalhes" className="border-t border-border/60 bg-background">
       <div className="mx-auto max-w-[1400px] grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-16 px-5 md:px-10 pt-4 pb-16 lg:pt-12 lg:pb-24">
@@ -39,20 +34,17 @@ export function ProductSection() {
         <div className="grid grid-cols-1 lg:grid-cols-[72px_1fr] gap-4 md:gap-6">
           <motion.div
             key={img}
-            initial={{ opacity: 0.4, scale: 1.01 }}
+            initial={{ opacity: 0, scale: 1.01 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4 }}
             className="order-1 lg:order-2 relative w-full aspect-square lg:aspect-[4/5] overflow-hidden rounded-2xl lg:rounded-none bg-secondary/60 group flex items-center justify-center p-3 sm:p-5 lg:p-0"
           >
-            {!loaded && (
-              <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-secondary to-muted" />
-            )}
             <img
               src={IMAGES[img]}
               alt="Meia-calça forrada térmica translúcida"
-              onLoad={() => setLoaded(true)}
-              className={`relative max-h-full max-w-full w-auto h-auto object-contain lg:h-full lg:w-full lg:object-cover transition-all duration-700 ${loaded ? "opacity-100" : "opacity-0"} group-hover:lg:scale-105`}
-              loading="lazy"
+              className="relative max-h-full max-w-full w-auto h-auto object-contain lg:h-full lg:w-full lg:object-cover transition-transform duration-700 group-hover:lg:scale-105"
+              loading="eager"
+              decoding="async"
             />
           </motion.div>
 
