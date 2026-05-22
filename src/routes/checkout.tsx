@@ -303,7 +303,18 @@ function CheckoutPage() {
         </div>
       ) : pixTx ? (
         <div className="mx-auto max-w-[1280px] px-4 md:px-10 py-8 md:py-12">
-          <PixPayment transaction={pixTx} productTitle={PRODUCT_TITLE} productMeta={PRODUCT_META} onPaid={() => setPaid(true)} />
+          <PixPayment transaction={pixTx} productTitle={PRODUCT_TITLE} productMeta={PRODUCT_META} onPaid={() => {
+            setPaid(true);
+            if (orderCtx) {
+              utmifyFn({ data: buildUtmifyOrder({
+                orderId: orderCtx.orderId,
+                createdAt: orderCtx.createdAt,
+                status: "paid",
+                paymentMethod: "pix",
+                approvedDate: utcNow(),
+              }) }).catch(() => {});
+            }
+          }} />
         </div>
       ) : (
       <>
