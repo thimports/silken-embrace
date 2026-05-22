@@ -108,9 +108,8 @@ export function ProductSection() {
 
           {/* Size */}
           <div className="mt-7">
-            <div className="flex items-center justify-between text-[12px] tracking-luxe uppercase text-muted-foreground">
+            <div className="text-[12px] tracking-luxe uppercase text-muted-foreground">
               <span>Tamanho</span>
-              <a href="#" className="text-foreground normal-case tracking-normal underline underline-offset-4">Guia de medidas</a>
             </div>
             <div className="mt-3 inline-flex items-baseline gap-2 border border-foreground bg-foreground text-background px-4 py-2.5">
               <span className="text-xs tracking-luxe uppercase">Tamanho Único</span>
