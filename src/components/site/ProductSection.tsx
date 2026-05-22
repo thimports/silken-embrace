@@ -68,7 +68,7 @@ export function ProductSection() {
         <div id="comprar" className="lg:pt-4">
           <div className="text-[11px] tracking-luxe uppercase text-muted-foreground">Lumière · Inverno '26</div>
           <h2 className="mt-2 font-display text-xl lg:text-[26px] leading-tight">
-            Meia-Calça Forrada Térmica<br />Translúcida · Lã Peluciada
+            2 Meia-Calça Forrada Térmica<br />Translúcida · Lã Peluciada
           </h2>
           <div className="mt-3 flex items-center gap-3 text-sm">
             <div className="flex items-center gap-0.5 text-caramel">
