@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Check, ChevronLeft, Lock, Shield, Truck, CreditCard, QrCode, Copy, CheckCircle2 } from "lucide-react";
+import { Check, ChevronLeft, Lock, Shield, Truck, CreditCard, QrCode, Copy, CheckCircle2, RotateCcw } from "lucide-react";
 import hero from "@/assets/hero.webp";
 
 export const Route = createFileRoute("/checkout")({
