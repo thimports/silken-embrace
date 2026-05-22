@@ -76,7 +76,6 @@ function CheckoutPage() {
   const back = () => setStep((s) => Math.max(0, s - 1));
 
   const subtotal = 79.9;
-  const shipping = 0;
   const discount = pay === "pix" ? subtotal * 0.05 : 0;
   const total = subtotal + shipping - discount;
   const PRODUCT_TITLE = "2 Meia-Calça Forrada Térmica Translúcida · Lã Peluciada Plus";
