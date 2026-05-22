@@ -135,11 +135,14 @@ export function ProductSection() {
           <div className="mt-6 flex flex-col gap-3">
             <a
               href="/checkout"
+              onClick={() => fbTrack("AddToCart", { content_name: "Meia-Calça Forrada Térmica", content_ids: ["lumiere-meia-2pk"], content_type: "product", value: 79.9, currency: "BRL" })}
               className="w-full inline-flex items-center justify-center bg-foreground text-background py-4 text-[13px] tracking-luxe uppercase hover:bg-foreground/90 transition-all"
             >
               Comprar agora
             </a>
-            <button className="w-full border border-foreground/20 py-4 text-[13px] tracking-luxe uppercase hover:bg-foreground hover:text-background transition-all">
+            <button
+              onClick={() => fbTrack("AddToCart", { content_name: "Meia-Calça Forrada Térmica", content_ids: ["lumiere-meia-2pk"], content_type: "product", value: 79.9, currency: "BRL" })}
+              className="w-full border border-foreground/20 py-4 text-[13px] tracking-luxe uppercase hover:bg-foreground hover:text-background transition-all">
               Adicionar à sacola
             </button>
           </div>
