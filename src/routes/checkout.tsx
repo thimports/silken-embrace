@@ -55,7 +55,7 @@ function CheckoutPage() {
   const [paid, setPaid] = useState(false);
 
   const SHIPPING = [
-    { id: "free", label: "Frete Grátis", speed: "7-8 dias úteis", price: 1 },
+    { id: "free", label: "Frete Grátis", speed: "7-8 dias úteis", price: 0 },
     { id: "express", label: "Loggi Express", speed: "3-4 dias úteis", price: 15 },
   ] as const;
   const [shippingId, setShippingId] = useState<string>("free");
