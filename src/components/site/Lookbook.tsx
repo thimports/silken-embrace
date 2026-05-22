@@ -14,9 +14,9 @@ const LOOKS = [
   },
   {
     src: l2,
-    eyebrow: "Tecnologia Dual",
-    title: "Fina por fora, quente por dentro",
-    desc: "Aparência translúcida e elegante, com proteção térmica escondida no forro. O melhor dos dois mundos: estilo refinado e aquecimento real.",
+    eyebrow: "Elasticidade",
+    title: "Veste do P ao GG com conforto",
+    desc: "Tecido resistente que não marca e não transparenta. Veste todos os corpos com alta elasticidade e conforto o dia todo.",
     Icon: Sparkles,
   },
   {
