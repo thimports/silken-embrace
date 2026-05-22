@@ -200,12 +200,9 @@ function CheckoutPage() {
                   <AnimatePresence mode="wait">
                     {pay === "pix" ? (
                       <motion.div key="pix" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="border border-border p-6 text-center">
-                        <div className="mx-auto size-48 grid place-items-center bg-cream border border-border">
-                          <QrCode className="h-32 w-32 text-foreground" strokeWidth={1} />
-                        </div>
-                        <p className="mt-4 text-sm text-muted-foreground">Escaneie o QR code ou copie o código abaixo</p>
-                        <button onClick={copyPix} className="mt-3 inline-flex items-center gap-2 border border-border px-4 py-2.5 text-xs tracking-luxe uppercase hover:bg-foreground hover:text-background transition-all">
-                          {copied ? <><CheckCircle2 className="h-4 w-4" strokeWidth={1.5} /> Copiado</> : <><Copy className="h-4 w-4" strokeWidth={1.5} /> Copiar código</>}
+                        <p className="text-sm text-muted-foreground">Clique abaixo para copiar o código PIX e pagar no app do seu banco.</p>
+                        <button onClick={copyPix} className="mt-4 inline-flex items-center gap-2 border border-border px-4 py-2.5 text-xs tracking-luxe uppercase hover:bg-foreground hover:text-background transition-all">
+                          {copied ? <><CheckCircle2 className="h-4 w-4" strokeWidth={1.5} /> Copiado</> : <><Copy className="h-4 w-4" strokeWidth={1.5} /> Copiar código PIX</>}
                         </button>
                       </motion.div>
                     ) : (
