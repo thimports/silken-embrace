@@ -23,12 +23,12 @@ export function Benefits() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-12 lg:mb-16 overflow-hidden aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9]"
+          className="mb-12 lg:mb-16 overflow-hidden rounded-lg"
         >
           <img
             src={boxesImg}
             alt="Embalagens Lumière empilhadas com cartão da marca"
-            className="h-full w-full object-cover"
+            className="h-auto w-full"
             loading="lazy"
           />
         </motion.div>
