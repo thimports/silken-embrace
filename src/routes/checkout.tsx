@@ -247,7 +247,7 @@ function CheckoutPage() {
               <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>R$ {subtotal.toFixed(2).replace(".", ",")}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Frete</span><span className="text-caramel">Grátis</span></div>
               {discount > 0 && (
-                <div className="flex justify-between"><span className="text-muted-foreground">Desconto PIX (10%)</span><span className="text-caramel">- R$ {discount.toFixed(2).replace(".", ",")}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Desconto PIX (5%)</span><span className="text-caramel">- R$ {discount.toFixed(2).replace(".", ",")}</span></div>
               )}
             </div>
 
