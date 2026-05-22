@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Check, ChevronLeft, Lock, Shield, Truck, CreditCard, QrCode, RotateCcw, Loader2, AlertCircle } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
