@@ -5,6 +5,7 @@ import { Check, ChevronLeft, Lock, Shield, Truck, CreditCard, QrCode, RotateCcw,
 import { useServerFn } from "@tanstack/react-start";
 import { createPixTransaction, createCardTransaction } from "@/lib/primecash.functions";
 import { PixPayment } from "@/components/checkout/PixPayment";
+import { PaymentConfirmed } from "@/components/checkout/PaymentConfirmed";
 import hero from "@/assets/hero.webp";
 
 export const Route = createFileRoute("/checkout")({
