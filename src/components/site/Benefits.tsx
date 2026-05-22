@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { Flame, Sparkles, Move, Scissors, Heart, Snowflake, Feather, Wind } from "lucide-react";
-import boxesImg from "@/assets/lumiere-boxes.png";
+import boxesImg from "@/assets/lumiere-boxes.webp";
 
 
 const ITEMS = [
