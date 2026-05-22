@@ -124,6 +124,20 @@ function CheckoutPage() {
         }});
         if (!tx?.pix?.qrcode) throw new Error("Não recebemos o código PIX. Tente novamente.");
         setPixTx({ id: tx.id, amount: tx.amount, pix: tx.pix });
+        // Track Purchase as soon as PIX is generated (per requirement)
+        const eventId = `purchase-pix-${tx.id}`;
+        fbTrack("Purchase", { value: total, currency: "BRL", content_ids: ["lumiere-meia-2pk"], content_type: "product", order_id: String(tx.id) }, { eventID: eventId });
+        capiFn({ data: {
+          eventName: "Purchase",
+          eventId,
+          eventSourceUrl: typeof window !== "undefined" ? window.location.href : undefined,
+          value: total,
+          currency: "BRL",
+          fbp: getFbp(),
+          fbc: getFbc(),
+          user: { email: f.email, phone: f.phone, name: f.name, cpf: f.cpf, city: f.city, state: f.state, zip: f.cep },
+          customData: { order_id: String(tx.id), payment_method: "pix" },
+        }}).catch(() => {});
       } else {
         const [mm, yy] = f.cardExp.split("/");
         const r = await cardFn({ data: {
@@ -141,7 +155,22 @@ function CheckoutPage() {
           },
         }});
         setCardResult({ status: r.status, refusedReason: r.refusedReason });
-        if (r.status === "paid") setPaid(true);
+        if (r.status === "paid") {
+          setPaid(true);
+          const eventId = `purchase-card-${r.id ?? Date.now()}`;
+          fbTrack("Purchase", { value: total, currency: "BRL", content_ids: ["lumiere-meia-2pk"], content_type: "product" }, { eventID: eventId });
+          capiFn({ data: {
+            eventName: "Purchase",
+            eventId,
+            eventSourceUrl: typeof window !== "undefined" ? window.location.href : undefined,
+            value: total,
+            currency: "BRL",
+            fbp: getFbp(),
+            fbc: getFbc(),
+            user: { email: f.email, phone: f.phone, name: f.name, cpf: f.cpf, city: f.city, state: f.state, zip: f.cep },
+            customData: { payment_method: "credit_card" },
+          }}).catch(() => {});
+        }
       }
     } catch (e: any) {
       setError(e?.message || "Erro ao processar pagamento. Tente novamente.");
