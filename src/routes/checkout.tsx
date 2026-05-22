@@ -263,8 +263,8 @@ function CheckoutPage() {
                             <div className="text-[13px] font-medium">{s.label}</div>
                             <div className="text-[11px] text-muted-foreground">{s.speed}</div>
                           </div>
-                          <div className={`text-sm font-medium whitespace-nowrap ${s.price === 1 ? "text-caramel" : ""}`}>
-                            {s.price === 1 ? "Grátis" : `R$ ${s.price.toFixed(2).replace(".", ",")}`}
+                          <div className={`text-sm font-medium whitespace-nowrap ${s.price === 0 ? "text-caramel" : ""}`}>
+                            {s.price === 0 ? "Grátis" : `R$ ${s.price.toFixed(2).replace(".", ",")}`}
                           </div>
                         </button>
                       ))}
