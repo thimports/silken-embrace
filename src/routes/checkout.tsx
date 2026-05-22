@@ -159,6 +159,86 @@ function CheckoutPage() {
     };
   };
 
+  // Retry helper with exponential backoff
+  const withRetry = async <T,>(fn: () => Promise<T>, attempts = 3, baseMs = 700): Promise<T> => {
+    let lastErr: any;
+    for (let i = 0; i < attempts; i++) {
+      try { return await fn(); } catch (e) {
+        lastErr = e;
+        if (i < attempts - 1) await new Promise((r) => setTimeout(r, baseMs * Math.pow(2, i)));
+      }
+    }
+    throw lastErr;
+  };
+
+  // Signature of current inputs — invalidates prewarmed PIX if user edits
+  const pixSig = useMemo(() => JSON.stringify({
+    amt: Math.round(total * 100),
+    n: f.name.trim(), em: f.email.trim(),
+    cpf: onlyDigits(f.cpf), ph: onlyDigits(f.phone),
+    cep: onlyDigits(f.cep), st: f.street.trim(), num: f.number.trim(),
+    ct: f.city.trim(), uf: f.state.trim(),
+  }), [total, f.name, f.email, f.cpf, f.phone, f.cep, f.street, f.number, f.city, f.state]);
+
+  // Background pre-generation of PIX while user fills the address
+  useEffect(() => {
+    if (finalizedRef.current || pay !== "pix") return;
+    const ready = f.name && f.email && f.cpf.replace(/\D/g, "").length >= 11
+      && f.phone.replace(/\D/g, "").length >= 10
+      && f.cep && f.street && f.number && f.city && f.state;
+    if (!ready) return;
+    if (pixTx && lastSigRef.current === pixSig) return;
+    if (pixTx && lastSigRef.current !== pixSig) setPixTx(null);
+    if (prewarming) return;
+
+    let cancelled = false;
+    const t = setTimeout(async () => {
+      setPrewarming(true);
+      try {
+        const tx = await withRetry(() => pixFn({ data: {
+          amount: Math.round(total * 100),
+          customer: buildCustomer(),
+          items: buildItems(),
+          address: buildAddress(),
+        }}), 3, 600);
+        if (cancelled) return;
+        if (tx?.pix?.qrcode) {
+          setPixTx({ id: tx.id, amount: tx.amount, pix: tx.pix });
+          lastSigRef.current = pixSig;
+        }
+      } catch { /* silent — handleFinish will retry */ }
+      finally { if (!cancelled) setPrewarming(false); }
+    }, 700);
+
+    return () => { cancelled = true; clearTimeout(t); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pixSig, pay]);
+
+  const firePixTracking = (tx: { id: number; amount: number }) => {
+    const createdAt = utcNow();
+    const orderId = String(tx.id);
+    setOrderCtx({ orderId, createdAt });
+
+    const eventId = `purchase-pix-${tx.id}`;
+    fbTrack("Purchase", { value: total, currency: "BRL", content_ids: ["lumiere-meia-2pk"], content_type: "product", order_id: orderId }, { eventID: eventId });
+    capiFn({ data: {
+      eventName: "Purchase",
+      eventId,
+      eventSourceUrl: typeof window !== "undefined" ? window.location.href : undefined,
+      value: total,
+      currency: "BRL",
+      fbp: getFbp(),
+      fbc: getFbc(),
+      user: { email: f.email, phone: f.phone, name: f.name, cpf: f.cpf, city: f.city, state: f.state, zip: f.cep },
+      customData: { order_id: orderId, payment_method: "pix" },
+    }}).catch(() => {});
+
+    utmifyFn({ data: buildUtmifyOrder({
+      orderId, createdAt, status: "waiting_payment", paymentMethod: "pix",
+      approvedDate: null,
+    }) }).catch(() => {});
+  };
+
   const handleFinish = async () => {
     setError(null);
     if (!f.name || !f.email || !f.cpf || !f.phone) {
@@ -170,39 +250,22 @@ function CheckoutPage() {
     setSubmitting(true);
     try {
       if (pay === "pix") {
-        const tx = await pixFn({ data: {
-          amount: Math.round(total * 100),
-          customer: buildCustomer(),
-          items: buildItems(),
-          address: buildAddress(),
-        }});
-        if (!tx?.pix?.qrcode) throw new Error("Não recebemos o código PIX. Tente novamente.");
-        setPixTx({ id: tx.id, amount: tx.amount, pix: tx.pix });
-
-        const createdAt = utcNow();
-        const orderId = String(tx.id);
-        setOrderCtx({ orderId, createdAt });
-
-        // Track Purchase as soon as PIX is generated (per requirement)
-        const eventId = `purchase-pix-${tx.id}`;
-        fbTrack("Purchase", { value: total, currency: "BRL", content_ids: ["lumiere-meia-2pk"], content_type: "product", order_id: orderId }, { eventID: eventId });
-        capiFn({ data: {
-          eventName: "Purchase",
-          eventId,
-          eventSourceUrl: typeof window !== "undefined" ? window.location.href : undefined,
-          value: total,
-          currency: "BRL",
-          fbp: getFbp(),
-          fbc: getFbc(),
-          user: { email: f.email, phone: f.phone, name: f.name, cpf: f.cpf, city: f.city, state: f.state, zip: f.cep },
-          customData: { order_id: orderId, payment_method: "pix" },
-        }}).catch(() => {});
-
-        // Utmify: PIX gerado (waiting_payment)
-        utmifyFn({ data: buildUtmifyOrder({
-          orderId, createdAt, status: "waiting_payment", paymentMethod: "pix",
-          approvedDate: null,
-        }) }).catch(() => {});
+        // Reuse pre-warmed PIX if signature still matches
+        let tx = (pixTx && lastSigRef.current === pixSig) ? pixTx : null;
+        if (!tx) {
+          const fresh = await withRetry(() => pixFn({ data: {
+            amount: Math.round(total * 100),
+            customer: buildCustomer(),
+            items: buildItems(),
+            address: buildAddress(),
+          }}), 3, 600);
+          if (!fresh?.pix?.qrcode) throw new Error("Não recebemos o código PIX. Tente novamente.");
+          tx = { id: fresh.id, amount: fresh.amount, pix: fresh.pix };
+          setPixTx(tx);
+          lastSigRef.current = pixSig;
+        }
+        finalizedRef.current = true;
+        firePixTracking(tx);
       } else {
         const [mm, yy] = f.cardExp.split("/");
         const r = await cardFn({ data: {
