@@ -13,13 +13,13 @@ import { MobileBuyBar } from "@/components/site/MobileBuyBar";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Meia-Calça Forrada Térmica Translúcida Plus · Lumière" },
+      { title: "2 Meia-Calça Forrada Térmica Translúcida Plus · Lumière" },
       {
         name: "description",
         content:
-          "Meia-calça forrada com lã peluciada, translúcida e modeladora. Conforto térmico premium, elegância europeia. Frete rápido e garantia.",
+          "2 meias-calças forradas com lã peluciada, translúcida e modeladora. Conforto térmico premium, elegância europeia. Frete rápido e garantia.",
       },
-      { property: "og:title", content: "Meia-Calça Forrada Térmica Translúcida · Lumière" },
+      { property: "og:title", content: "2 Meia-Calça Forrada Térmica Translúcida · Lumière" },
       { property: "og:description", content: "Aqueça seus dias frios com elegância. Coleção Hiver '26." },
     ],
     links: [
