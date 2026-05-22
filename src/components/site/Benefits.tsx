@@ -1,5 +1,7 @@
 import { motion } from "motion/react";
 import { Flame, Sparkles, Move, Scissors, Heart, Snowflake, Feather, Wind } from "lucide-react";
+import boxesImg from "@/assets/lumiere-boxes.png";
+
 
 const ITEMS = [
   { I: Flame, t: "Forro térmico macio", d: "Lã peluciada interna que aquece sem aumentar volume." },
@@ -16,6 +18,20 @@ export function Benefits() {
   return (
     <section className="bg-secondary/40 border-y border-border/60">
       <div className="mx-auto max-w-[1400px] px-5 md:px-10 py-20 lg:py-28">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-12 lg:mb-16 overflow-hidden aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9]"
+        >
+          <img
+            src={boxesImg}
+            alt="Embalagens Lumière empilhadas com cartão da marca"
+            className="h-full w-full object-cover"
+            loading="lazy"
+          />
+        </motion.div>
         <div className="max-w-2xl">
           <span className="text-[11px] tracking-luxe uppercase text-muted-foreground">Os detalhes</span>
           <h2 className="mt-3 font-display text-4xl lg:text-6xl leading-[1.05]">
