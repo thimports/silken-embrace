@@ -23,8 +23,23 @@ export function Header() {
 
   return (
     <>
-      <div className="bg-primary text-primary-foreground text-[11px] tracking-luxe uppercase py-2 text-center">
-        Frete grátis acima de R$ 199 · Entrega para todo Brasil
+      <div className="bg-primary text-primary-foreground text-[11px] tracking-luxe uppercase py-2 overflow-hidden">
+        <div className="flex w-max animate-marquee whitespace-nowrap">
+          {[0, 1].map((k) => (
+            <div key={k} className="flex shrink-0 items-center">
+              {[
+                "Frete grátis acima de R$ 199",
+                "Entrega para todo Brasil",
+                "60% Off nesse inverno",
+              ].map((msg) => (
+                <span key={`${k}-${msg}`} className="flex items-center px-8">
+                  {msg}
+                  <span className="ml-16 opacity-50">·</span>
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
       <motion.header
         initial={false}
