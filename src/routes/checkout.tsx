@@ -77,36 +77,43 @@ function CheckoutPage() {
     <div className="min-h-screen bg-cream">
       {/* slim header */}
       <header className="border-b border-border bg-background">
-        <div className="mx-auto max-w-[1280px] px-5 md:px-10 h-16 flex items-center justify-between">
-          <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-            <ChevronLeft className="h-4 w-4" strokeWidth={1.5} /> Continuar comprando
+        <div className="mx-auto max-w-[1280px] px-4 md:px-10 h-14 md:h-16 flex items-center justify-between gap-3">
+          <Link to="/" className="inline-flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground hover:text-foreground shrink-0">
+            <ChevronLeft className="h-4 w-4" strokeWidth={1.5} />
+            <span className="hidden sm:inline">Continuar comprando</span>
+            <span className="sm:hidden">Voltar</span>
           </Link>
-          <div className="font-display text-xl tracking-[0.2em] uppercase">Lumière</div>
-          <div className="hidden md:inline-flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="font-display text-base md:text-xl tracking-[0.2em] uppercase truncate">Lumière</div>
+          <div className="hidden md:inline-flex items-center gap-2 text-xs text-muted-foreground shrink-0">
             <Lock className="h-3.5 w-3.5" strokeWidth={1.5} /> Pagamento 100% seguro
+          </div>
+          <div className="md:hidden inline-flex items-center text-muted-foreground shrink-0">
+            <Lock className="h-4 w-4" strokeWidth={1.5} />
           </div>
         </div>
       </header>
 
-      <div className="mx-auto max-w-[1280px] grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-10 px-5 md:px-10 py-10 lg:py-16">
+
+      <div className="mx-auto max-w-[1280px] grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-8 lg:gap-10 px-4 md:px-10 py-6 md:py-10 lg:py-16">
         {/* Steps + content */}
         <div>
           {/* progress */}
-          <div className="flex items-center gap-3 mb-10">
+          <div className="flex items-center gap-2 sm:gap-3 mb-6 md:mb-10">
             {STEPS.map((s, i) => {
               const done = i < step;
               const active = i === step;
               return (
-                <div key={s} className="flex items-center gap-3 flex-1 last:flex-none">
-                  <div className={`grid place-items-center size-8 rounded-full text-[12px] transition-all ${done ? "bg-caramel text-background" : active ? "bg-foreground text-background" : "bg-secondary text-muted-foreground"}`}>
+                <div key={s} className="flex items-center gap-2 sm:gap-3 flex-1 last:flex-none min-w-0">
+                  <div className={`grid place-items-center size-7 sm:size-8 rounded-full text-[12px] shrink-0 transition-all ${done ? "bg-caramel text-background" : active ? "bg-foreground text-background" : "bg-secondary text-muted-foreground"}`}>
                     {done ? <Check className="h-4 w-4" strokeWidth={2} /> : i + 1}
                   </div>
-                  <span className={`text-[11px] tracking-luxe uppercase ${active ? "text-foreground" : "text-muted-foreground"}`}>{s}</span>
+                  <span className={`text-[10px] sm:text-[11px] tracking-luxe uppercase truncate ${active ? "text-foreground" : "text-muted-foreground"}`}>{s}</span>
                   {i < STEPS.length - 1 && <div className={`hidden sm:block flex-1 h-px ${i < step ? "bg-caramel" : "bg-border"}`} />}
                 </div>
               );
             })}
           </div>
+
 
           <AnimatePresence mode="wait">
             <motion.div
@@ -115,7 +122,7 @@ function CheckoutPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -16 }}
               transition={{ duration: 0.35 }}
-              className="bg-background border border-border p-6 md:p-10 shadow-soft"
+              className="bg-background border border-border p-5 md:p-10 shadow-soft"
             >
               {step === 0 && (
                 <div className="space-y-5">
@@ -154,22 +161,23 @@ function CheckoutPage() {
               {step === 2 && (
                 <div className="space-y-6">
                   <h2 className="font-display text-2xl md:text-3xl">Pagamento</h2>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button onClick={() => setPay("pix")} className={`flex items-center gap-3 p-4 border transition-all ${pay === "pix" ? "border-foreground bg-foreground/[0.03]" : "border-border"}`}>
-                      <QrCode className="h-5 w-5" strokeWidth={1.5} />
-                      <div className="text-left">
+                      <QrCode className="h-5 w-5 shrink-0" strokeWidth={1.5} />
+                      <div className="text-left min-w-0">
                         <div className="text-sm font-medium">PIX</div>
                         <div className="text-[11px] text-caramel">5% off</div>
                       </div>
                     </button>
                     <button onClick={() => setPay("card")} className={`flex items-center gap-3 p-4 border transition-all ${pay === "card" ? "border-foreground bg-foreground/[0.03]" : "border-border"}`}>
-                      <CreditCard className="h-5 w-5" strokeWidth={1.5} />
-                      <div className="text-left">
-                        <div className="text-sm font-medium">Cartão de crédito</div>
+                      <CreditCard className="h-5 w-5 shrink-0" strokeWidth={1.5} />
+                      <div className="text-left min-w-0">
+                        <div className="text-sm font-medium truncate">Cartão de crédito</div>
                         <div className="text-[11px] text-muted-foreground">até 12x sem juros</div>
                       </div>
                     </button>
                   </div>
+
 
                   <AnimatePresence mode="wait">
                     {pay === "pix" ? (
@@ -206,20 +214,21 @@ function CheckoutPage() {
             </motion.div>
           </AnimatePresence>
 
-          <div className="mt-6 flex items-center justify-between gap-4">
-            <button onClick={back} disabled={step === 0} className="inline-flex items-center gap-2 px-4 py-3 text-[12px] tracking-luxe uppercase text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed">
+          <div className="mt-6 flex items-center justify-between gap-3">
+            <button onClick={back} disabled={step === 0} className="inline-flex items-center gap-1.5 px-2 sm:px-4 py-3 text-[12px] tracking-luxe uppercase text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed shrink-0">
               <ChevronLeft className="h-4 w-4" strokeWidth={1.5} /> Voltar
             </button>
             {step < 2 ? (
-              <button onClick={next} className="inline-flex items-center gap-2 bg-foreground text-background px-8 py-4 text-[12px] tracking-luxe uppercase hover:bg-foreground/90">
+              <button onClick={next} className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-foreground text-background px-6 sm:px-8 py-4 text-[12px] tracking-luxe uppercase hover:bg-foreground/90">
                 Continuar
               </button>
             ) : (
-              <button className="inline-flex items-center gap-2 bg-foreground text-background px-8 py-4 text-[12px] tracking-luxe uppercase hover:bg-foreground/90">
+              <button className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-foreground text-background px-6 sm:px-8 py-4 text-[12px] tracking-luxe uppercase hover:bg-foreground/90">
                 <Lock className="h-4 w-4" strokeWidth={1.5} /> Finalizar compra
               </button>
             )}
           </div>
+
 
           <div className="mt-8 grid grid-cols-3 gap-4 text-center text-[11px] tracking-luxe uppercase text-muted-foreground">
             <div className="flex flex-col items-center gap-2"><Lock className="h-4 w-4" strokeWidth={1.5} /> SSL 256-bit</div>
@@ -230,18 +239,19 @@ function CheckoutPage() {
 
         {/* Order summary */}
         <aside className="lg:sticky lg:top-8 self-start">
-          <div className="bg-background border border-border p-6 md:p-8 shadow-soft">
+          <div className="bg-background border border-border p-5 md:p-8 shadow-soft">
             <div className="text-[11px] tracking-luxe uppercase text-muted-foreground">Seu pedido</div>
-            <div className="mt-5 flex gap-4">
-              <div className="size-20 shrink-0 overflow-hidden bg-secondary">
+            <div className="mt-5 flex gap-3 sm:gap-4">
+              <div className="size-16 sm:size-20 shrink-0 overflow-hidden bg-secondary">
                 <img src={hero} alt="" className="h-full w-full object-cover" />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <div className="text-[13px] font-medium leading-snug">2 Meia-Calça Forrada Térmica Translúcida · Lã Peluciada Plus</div>
-                <div className="mt-1 text-xs text-muted-foreground">Cor: Nude · Tamanho: G/GG · Qtd: 1</div>
+                <div className="mt-1 text-xs text-muted-foreground">Cor: Nude · Tam. Único · Qtd: 1</div>
               </div>
-              <div className="font-display text-base">R$ 79,90</div>
+              <div className="font-display text-sm sm:text-base whitespace-nowrap shrink-0">R$ 79,90</div>
             </div>
+
 
             <div className="mt-6 pt-6 border-t border-border space-y-2.5 text-sm">
               <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>R$ {subtotal.toFixed(2).replace(".", ",")}</span></div>
