@@ -7,6 +7,7 @@ import { createPixTransaction, createCardTransaction } from "@/lib/primecash.fun
 import { PixPayment } from "@/components/checkout/PixPayment";
 import { PaymentConfirmed } from "@/components/checkout/PaymentConfirmed";
 import hero from "@/assets/hero.webp";
+import pixLogo from "@/assets/pix-logo.png";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
