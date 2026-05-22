@@ -50,7 +50,7 @@ export function ProductSection() {
               <button
                 key={i}
                 onClick={() => setImg(i)}
-                className={`relative shrink-0 aspect-square w-[64px] sm:w-[72px] overflow-hidden rounded-lg border bg-secondary/60 flex items-center justify-center p-1.5 transition-all ${
+                className={`relative shrink-0 aspect-square w-[64px] sm:w-[72px] overflow-hidden rounded-lg border flex items-center justify-center p-1.5 transition-all ${
                   img === i ? "border-foreground" : "border-border/60 opacity-70 hover:opacity-100"
                 }`}
               >
