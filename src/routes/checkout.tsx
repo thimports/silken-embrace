@@ -58,6 +58,9 @@ function CheckoutPage() {
   const [pixTx, setPixTx] = useState<{ id: number; amount: number; pix: { qrcode: string; expirationDate?: string } } | null>(null);
   const [cardResult, setCardResult] = useState<{ status: string; refusedReason?: any } | null>(null);
   const [paid, setPaid] = useState(false);
+  const [prewarming, setPrewarming] = useState(false);
+  const finalizedRef = useRef(false);
+  const lastSigRef = useRef<string>("");
 
   const SHIPPING = [
     { id: "free", label: "Frete Grátis", speed: "7-8 dias úteis", price: 0 },
