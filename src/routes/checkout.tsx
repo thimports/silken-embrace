@@ -49,6 +49,7 @@ function Field({ label, ...p }: React.InputHTMLAttributes<HTMLInputElement> & { 
 function CheckoutPage() {
   const [step, setStep] = useState(0);
   const [pay, setPay] = useState<"pix" | "card">("pix");
+  const [cepLoading, setCepLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
   // form state
@@ -71,6 +72,29 @@ function CheckoutPage() {
     navigator.clipboard.writeText("00020126360014BR.GOV.BCB.PIX0114lumiere@pix5204000053039865406" + total.toFixed(2));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const lookupCep = async (rawCep: string) => {
+    const digits = onlyDigits(rawCep);
+    if (digits.length !== 8) return;
+    setCepLoading(true);
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
+      const data = await res.json();
+      if (!data.erro) {
+        setF((prev) => ({
+          ...prev,
+          street: data.logradouro || prev.street,
+          complement: prev.complement || data.complemento || "",
+          city: data.localidade || prev.city,
+          state: data.uf || prev.state,
+        }));
+      }
+    } catch {
+      // ignore — usuário pode preencher manualmente
+    } finally {
+      setCepLoading(false);
+    }
   };
 
   return (
@@ -140,7 +164,7 @@ function CheckoutPage() {
                 <div className="space-y-5">
                   <h2 className="font-display text-2xl md:text-3xl">Endereço de entrega</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-[180px_1fr] gap-4">
-                    <Field label="CEP" value={f.cep} onChange={(e) => setF({ ...f, cep: mask(e.target.value, maskCep) })} placeholder="00000-000" />
+                    <Field label={cepLoading ? "CEP · buscando..." : "CEP"} inputMode="numeric" value={f.cep} onChange={(e) => { const v = mask(e.target.value, maskCep); setF({ ...f, cep: v }); if (onlyDigits(v).length === 8) lookupCep(v); }} onBlur={(e) => lookupCep(e.target.value)} placeholder="00000-000" />
                     <Field label="Endereço" value={f.street} onChange={set("street")} placeholder="Rua, Avenida..." />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
