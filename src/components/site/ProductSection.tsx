@@ -30,7 +30,7 @@ export function ProductSection() {
     <section id="detalhes" className="border-t border-border/60 bg-background">
       <div className="mx-auto max-w-[1400px] grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-16 px-5 md:px-10 pt-4 pb-16 lg:pt-12 lg:pb-24">
         {/* Gallery */}
-        <div className="grid grid-cols-1 lg:grid-cols-[72px_1fr] gap-4 md:gap-6">
+        <div className="min-w-0 grid grid-cols-1 lg:grid-cols-[72px_1fr] gap-4 md:gap-6">
           <motion.div
             key={img}
             initial={{ opacity: 0, scale: 1.01 }}
@@ -64,7 +64,7 @@ export function ProductSection() {
 
 
         {/* Buy box */}
-        <div id="comprar" className="lg:pt-4">
+        <div id="comprar" className="min-w-0 lg:pt-4">
           <div className="text-[11px] tracking-luxe uppercase text-muted-foreground">Lumière · Inverno '26</div>
           <h2 className="mt-2 font-display text-xl lg:text-[26px] leading-tight">
             2 Meia-Calça Forrada Térmica<br />Translúcida · Lã Peluciada
