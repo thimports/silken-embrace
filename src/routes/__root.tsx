@@ -7,6 +7,8 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { initFbPixel } from "@/lib/fbpixel";
 
 import appCss from "../styles.css?url";
 
