@@ -58,7 +58,7 @@ function UpsellPage() {
 
   const pixFn = useServerFn(createPixTransaction);
   const capiFn = useServerFn(sendFbEvent);
-  const utmifyFn = useServerFn(sendUtmifyOrder);
+  
   const recordOrderFn = useServerFn(recordOrder);
   const markPaidFn = useServerFn(markOrderPaid);
 
