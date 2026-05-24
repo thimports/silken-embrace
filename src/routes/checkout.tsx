@@ -282,6 +282,7 @@ function CheckoutPage() {
           lastSigRef.current = pixSig;
         }
         finalizedRef.current = true;
+        setShowPix(true);
         firePixTracking(tx);
       } else {
         const [mm, yy] = f.cardExp.split("/");
