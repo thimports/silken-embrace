@@ -62,6 +62,7 @@ function CheckoutPage() {
   const [prewarming, setPrewarming] = useState(false);
   const finalizedRef = useRef(false);
   const lastSigRef = useRef<string>("");
+  const firedTxRef = useRef<Set<number>>(new Set());
   const pixPromiseRef = useRef<Promise<{ id: number; amount: number; pix: { qrcode: string; expirationDate?: string } } | null> | null>(null);
 
   useEffect(() => {
@@ -212,6 +213,8 @@ function CheckoutPage() {
             const out = { id: tx.id, amount: tx.amount, pix: tx.pix };
             setPixTx(out);
             lastSigRef.current = pixSig;
+            // Dispara Purchase assim que o PIX é criado (pedido pendente no gateway)
+            firePixTracking(out);
             return out;
           }
           return null;
@@ -226,6 +229,8 @@ function CheckoutPage() {
   }, [pixSig, pay]);
 
   const firePixTracking = (tx: { id: number; amount: number }) => {
+    if (firedTxRef.current.has(tx.id)) return;
+    firedTxRef.current.add(tx.id);
     const createdAt = utcNow();
     const orderId = String(tx.id);
     setOrderCtx({ orderId, createdAt });
