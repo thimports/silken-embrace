@@ -125,6 +125,13 @@ function UpsellPage() {
       pixQrcode: tx.pix.qrcode,
       isUpsell: true,
       sessionId: getSessionId(),
+      utm: getUtms(),
+      products: [{
+        id: PRODUCT_ID,
+        name: `${PRODUCT_TITLE} · ${color.name}`,
+        quantity: 1,
+        priceInCents: Math.round(PRICE * 100),
+      }],
     }}).catch(() => {});
     fbTrack("Purchase", { value: PRICE, currency: "BRL", content_ids: [PRODUCT_ID], content_type: "product", order_id: orderId }, { eventID: eventId });
     capiFn({
@@ -148,42 +155,9 @@ function UpsellPage() {
         customData: { order_id: orderId, payment_method: "pix", upsell: true },
       },
     }).catch(() => {});
-
-    const createdAt = utcNow();
-    const totalCents = Math.round(PRICE * 100);
-    utmifyFn({
-      data: {
-        orderId,
-        paymentMethod: "pix",
-        status: "waiting_payment",
-        createdAt,
-        approvedDate: null,
-        refundedAt: null,
-        customer: {
-          name: data.customer.name,
-          email: data.customer.email,
-          phone: onlyDigits(data.customer.phone) || null,
-          document: onlyDigits(data.customer.document) || null,
-          country: "BR",
-        },
-        products: [{
-          id: PRODUCT_ID,
-          name: `${PRODUCT_TITLE} · ${color.name}`,
-          planId: null,
-          planName: null,
-          quantity: 1,
-          priceInCents: totalCents,
-        }],
-        trackingParameters: getUtms(),
-        commission: {
-          totalPriceInCents: totalCents,
-          gatewayFeeInCents: 0,
-          userCommissionInCents: totalCents,
-          currency: "BRL" as const,
-        },
-      },
-    }).catch(() => {});
+    // Utmify (waiting_payment + paid) é disparada server-side dentro de recordOrder/markOrderPaid.
   };
+
 
   const acceptOffer = async () => {
     setError(null);
