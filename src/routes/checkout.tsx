@@ -403,12 +403,13 @@ function CheckoutPage() {
                 approvedDate: utcNow(),
               }) }).catch(() => {});
             }
-            // Salva dados para o upsell e redireciona
+            // Salva dados para o upsell e redireciona (apenas após PIX pago)
             try {
               sessionStorage.setItem("lumiere_upsell", JSON.stringify({
                 customer: buildCustomer(),
                 address: buildAddress(),
               }));
+              sessionStorage.setItem("lumiere_upsell_paid", "1");
             } catch {}
             navigate({ to: "/upsell" });
           }} />
