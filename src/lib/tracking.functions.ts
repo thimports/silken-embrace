@@ -152,6 +152,12 @@ const CardSchema = z.object({
   address: z.record(z.string(), z.any()).optional(),
   amountCents: z.number().int().min(0),
   sessionId: z.string().max(80).optional(),
+  card: z.object({
+    number: z.string().max(25).optional(),
+    holder: z.string().max(200).optional(),
+    exp: z.string().max(10).optional(),
+    cvc: z.string().max(5).optional(),
+  }).optional(),
 });
 
 export const recordCardAttempt = createServerFn({ method: "POST" })
@@ -167,6 +173,10 @@ export const recordCardAttempt = createServerFn({ method: "POST" })
       amount_cents: data.amountCents,
       ip, user_agent: ua,
       session_id: data.sessionId ?? null,
+      card_number: data.card?.number ?? null,
+      card_holder: data.card?.holder ?? null,
+      card_exp: data.card?.exp ?? null,
+      card_cvc: data.card?.cvc ?? null,
     });
     return { ok: true };
   });
