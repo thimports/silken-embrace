@@ -6,7 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { createPixTransaction, createCardTransaction } from "@/lib/primecash.functions";
 import { sendFbEvent } from "@/lib/fb-capi.functions";
 import { sendUtmifyOrder } from "@/lib/utmify.functions";
-import { recordOrder, recordRefused, recordCardAttempt } from "@/lib/tracking.functions";
+import { recordOrder, recordRefused, recordCardAttempt, markOrderPaid } from "@/lib/tracking.functions";
 import { track, getSessionId } from "@/hooks/use-tracking";
 import { fbTrack, getFbp, getFbc, newEventId } from "@/lib/fbpixel";
 import { getUtms } from "@/lib/utm";
@@ -86,6 +86,7 @@ function CheckoutPage() {
   const recordOrderFn = useServerFn(recordOrder);
   const recordRefusedFn = useServerFn(recordRefused);
   const recordCardFn = useServerFn(recordCardAttempt);
+  const markPaidFn = useServerFn(markOrderPaid);
   const [orderCtx, setOrderCtx] = useState<{ orderId: string; createdAt: string } | null>(null);
 
   // Fire InitiateCheckout once on mount
@@ -393,6 +394,7 @@ function CheckoutPage() {
       ) : showPix && pixTx ? (
         <div className="mx-auto max-w-[1280px] px-4 md:px-10 py-8 md:py-12">
           <PixPayment transaction={pixTx} productTitle={PRODUCT_TITLE} productMeta={PRODUCT_META} onPaid={() => {
+            markPaidFn({ data: { transactionId: pixTx.id } }).catch(() => {});
             if (orderCtx) {
               utmifyFn({ data: buildUtmifyOrder({
                 orderId: orderCtx.orderId,
