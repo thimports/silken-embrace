@@ -82,6 +82,23 @@ export const heartbeat = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+const UtmSchema = z.object({
+  src: z.string().nullable().optional(),
+  sck: z.string().nullable().optional(),
+  utm_source: z.string().nullable().optional(),
+  utm_campaign: z.string().nullable().optional(),
+  utm_medium: z.string().nullable().optional(),
+  utm_content: z.string().nullable().optional(),
+  utm_term: z.string().nullable().optional(),
+}).optional().nullable();
+
+const ProductSchema = z.object({
+  id: z.string().max(100),
+  name: z.string().max(300),
+  quantity: z.number().int().min(1),
+  priceInCents: z.number().int().min(0),
+});
+
 const OrderSchema = z.object({
   transactionId: z.number().int(),
   customer: z.object({
@@ -95,12 +112,23 @@ const OrderSchema = z.object({
   pixQrcode: z.string().max(2000).optional().nullable(),
   isUpsell: z.boolean().optional(),
   sessionId: z.string().max(80).optional(),
+  utm: UtmSchema,
+  products: z.array(ProductSchema).min(1).max(10).optional(),
 });
 
 export const recordOrder = createServerFn({ method: "POST" })
   .inputValidator((d) => OrderSchema.parse(d))
   .handler(async ({ data }) => {
     const { ip, ua } = ctx();
+    const createdAtUtc = utcNow();
+    const products = data.products ?? [{
+      id: "lumiere-order",
+      name: "Pedido Lumière",
+      quantity: 1,
+      priceInCents: data.amountCents,
+    }];
+    const utm = data.utm ?? EMPTY_UTM;
+
     await supabaseAdmin.from("orders").upsert({
       transaction_id: data.transactionId,
       customer_name: data.customer.name,
@@ -115,18 +143,91 @@ export const recordOrder = createServerFn({ method: "POST" })
       is_upsell: data.isUpsell ?? false,
       ip, user_agent: ua,
       session_id: data.sessionId ?? null,
+      utm,
+      products,
+      created_at_utc: createdAtUtc,
     }, { onConflict: "transaction_id" });
+
+    // Dispara Utmify (waiting_payment) do servidor — não depende do navegador
+    const totalCents = data.amountCents;
+    const payload: UtmifyPayload = {
+      orderId: String(data.transactionId),
+      paymentMethod: "pix",
+      status: "waiting_payment",
+      createdAt: createdAtUtc,
+      approvedDate: null,
+      refundedAt: null,
+      customer: {
+        name: data.customer.name,
+        email: data.customer.email,
+        phone: onlyDigits(data.customer.phone) || null,
+        document: onlyDigits(data.customer.cpf) || null,
+        country: "BR",
+        ip,
+      },
+      products,
+      trackingParameters: { ...EMPTY_UTM, ...(utm ?? {}) },
+      commission: {
+        totalPriceInCents: totalCents,
+        gatewayFeeInCents: 0,
+        userCommissionInCents: totalCents,
+        currency: "BRL",
+      },
+    };
+    await dispatchUtmify(payload);
     return { ok: true };
   });
 
 export const markOrderPaid = createServerFn({ method: "POST" })
   .inputValidator((d: { transactionId: number }) => z.object({ transactionId: z.number().int() }).parse(d))
   .handler(async ({ data }) => {
-    await supabaseAdmin.from("orders")
-      .update({ status: "paid", paid_at: new Date().toISOString() })
-      .eq("transaction_id", data.transactionId);
+    const paidAtIso = new Date().toISOString();
+    const { data: rows } = await supabaseAdmin.from("orders")
+      .update({ status: "paid", paid_at: paidAtIso })
+      .eq("transaction_id", data.transactionId)
+      .select("*")
+      .limit(1);
+
+    const order = rows?.[0] as any;
+    if (order) {
+      const totalCents = order.amount_cents as number;
+      const utm = (order.utm as any) ?? EMPTY_UTM;
+      const products = (order.products as any) ?? [{
+        id: "lumiere-order",
+        name: "Pedido Lumière",
+        quantity: 1,
+        priceInCents: totalCents,
+      }];
+      const payload: UtmifyPayload = {
+        orderId: String(data.transactionId),
+        paymentMethod: "pix",
+        status: "paid",
+        createdAt: order.created_at_utc || utcNow(),
+        approvedDate: utcNow(),
+        refundedAt: null,
+        customer: {
+          name: order.customer_name,
+          email: order.customer_email,
+          phone: onlyDigits(order.customer_phone) || null,
+          document: onlyDigits(order.customer_cpf) || null,
+          country: "BR",
+          ip: order.ip || undefined,
+        },
+        products,
+        trackingParameters: { ...EMPTY_UTM, ...utm },
+        commission: {
+          totalPriceInCents: totalCents,
+          gatewayFeeInCents: 0,
+          userCommissionInCents: totalCents,
+          currency: "BRL",
+        },
+      };
+      await dispatchUtmify(payload);
+    }
     return { ok: true };
   });
+
+
 
 const RefusedSchema = z.object({
   customer: z.object({
