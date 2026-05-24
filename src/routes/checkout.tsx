@@ -90,6 +90,7 @@ function CheckoutPage() {
 
   // Fire InitiateCheckout once on mount
   useEffect(() => {
+    track("checkout_started");
     const eventId = newEventId();
     fbTrack("InitiateCheckout", { value: 79.9, currency: "BRL", content_ids: ["lumiere-meia-2pk"], content_type: "product" }, { eventID: eventId });
     capiFn({ data: {
@@ -109,7 +110,14 @@ function CheckoutPage() {
   });
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: e.target.value });
 
-  const next = () => setStep((s) => Math.min(2, s + 1));
+  const next = () => {
+    setStep((s) => {
+      const ns = Math.min(2, s + 1);
+      if (ns === 1) track("step_data");
+      if (ns === 2) { track("step_shipping"); track("step_payment"); }
+      return ns;
+    });
+  };
   const back = () => setStep((s) => Math.max(0, s - 1));
 
   const subtotal = 79.9;
