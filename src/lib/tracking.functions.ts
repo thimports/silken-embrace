@@ -1,7 +1,22 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestIP, getRequestHeader } from "@tanstack/react-start/server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { dispatchUtmify, type UtmifyPayload } from "@/lib/utmify.server";
 import { z } from "zod";
+
+const utcNow = () => {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
+};
+
+const onlyDigits = (s?: string | null) => (s ?? "").replace(/\D/g, "");
+
+const EMPTY_UTM = {
+  src: null, sck: null,
+  utm_source: null, utm_campaign: null, utm_medium: null, utm_content: null, utm_term: null,
+};
+
 
 const ctx = () => {
   let ip: string | undefined;
