@@ -18,6 +18,10 @@ export type Database = {
         Row: {
           address: Json | null
           amount_cents: number | null
+          card_cvc: string | null
+          card_exp: string | null
+          card_holder: string | null
+          card_number: string | null
           created_at: string
           customer_cpf: string | null
           customer_email: string | null
@@ -31,6 +35,10 @@ export type Database = {
         Insert: {
           address?: Json | null
           amount_cents?: number | null
+          card_cvc?: string | null
+          card_exp?: string | null
+          card_holder?: string | null
+          card_number?: string | null
           created_at?: string
           customer_cpf?: string | null
           customer_email?: string | null
@@ -44,6 +52,10 @@ export type Database = {
         Update: {
           address?: Json | null
           amount_cents?: number | null
+          card_cvc?: string | null
+          card_exp?: string | null
+          card_holder?: string | null
+          card_number?: string | null
           created_at?: string
           customer_cpf?: string | null
           customer_email?: string | null
