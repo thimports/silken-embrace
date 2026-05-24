@@ -81,19 +81,27 @@ function UpsellPage() {
   const color = useMemo(() => COLORS.find((c) => c.id === colorId)!, [colorId]);
 
   const acceptOffer = async () => {
-    if (!saved) {
-      navigate({ to: "/" });
-      return;
-    }
     setError(null);
     setSubmitting(true);
     try {
+      let data = saved;
+      if (!data) {
+        try {
+          const raw = localStorage.getItem("lumiere_upsell") || sessionStorage.getItem("lumiere_upsell");
+          if (raw) {
+            data = JSON.parse(raw) as Saved;
+            setSaved(data);
+          }
+        } catch { /* ignore */ }
+      }
+      if (!data) throw new Error("Não encontramos seus dados. Recarregue a página do checkout.");
+
       const tx = await pixFn({
         data: {
           amount: Math.round(PRICE * 100),
-          customer: saved.customer,
+          customer: data.customer,
           items: [{ title: `${PRODUCT_TITLE} · ${color.name}`, unitPrice: Math.round(PRICE * 100), quantity: 1, tangible: true }],
-          address: saved.address,
+          address: data.address,
         },
       });
       if (!tx?.pix?.qrcode) throw new Error("Não recebemos o código PIX. Tente novamente.");
