@@ -144,7 +144,7 @@ export type Database = {
           products: Json | null
           session_id: string | null
           status: string
-          transaction_id: number | null
+          transaction_id: string | null
           user_agent: string | null
           utm: Json | null
         }
@@ -166,7 +166,7 @@ export type Database = {
           products?: Json | null
           session_id?: string | null
           status?: string
-          transaction_id?: number | null
+          transaction_id?: string | null
           user_agent?: string | null
           utm?: Json | null
         }
@@ -188,7 +188,7 @@ export type Database = {
           products?: Json | null
           session_id?: string | null
           status?: string
-          transaction_id?: number | null
+          transaction_id?: string | null
           user_agent?: string | null
           utm?: Json | null
         }

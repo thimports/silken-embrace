@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { Copy, CheckCircle2, Clock, ShieldCheck, Loader2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
-import { getTransactionStatus } from "@/lib/primecash.functions";
+import { getTransactionStatus } from "@/lib/buypix.functions";
 import hero from "@/assets/product-1.webp";
 
 type Props = {
   transaction: {
-    id: number;
+    id: string;
     amount: number;
     pix: { qrcode: string; expirationDate?: string };
   };
