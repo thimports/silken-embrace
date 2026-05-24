@@ -9,7 +9,7 @@ export const ADMIN_SESSION_CONFIG = {
   maxAge: 60 * 60 * 24 * 7, // 7 days
   cookie: {
     httpOnly: true,
-    sameSite: "lax" as const,
+    sameSite: "none" as const,
     secure: true,
     path: "/",
   },
