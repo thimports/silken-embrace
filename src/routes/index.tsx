@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { track } from "@/hooks/use-tracking";
 import { Header } from "@/components/site/Header";
 import { Hero } from "@/components/site/Hero";
 import { ProductSection } from "@/components/site/ProductSection";
@@ -38,6 +40,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  useEffect(() => { track("product_view"); }, []);
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />

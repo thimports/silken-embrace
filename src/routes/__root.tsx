@@ -10,6 +10,7 @@ import {
 import { useEffect } from "react";
 import { initFbPixel } from "@/lib/fbpixel";
 import { captureUtms } from "@/lib/utm";
+import { useTrackingBootstrap } from "@/hooks/use-tracking";
 
 import appCss from "../styles.css?url";
 
@@ -117,6 +118,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useTrackingBootstrap();
 
   useEffect(() => {
     captureUtms();
