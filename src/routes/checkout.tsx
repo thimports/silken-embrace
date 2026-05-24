@@ -82,12 +82,11 @@ function CheckoutPage() {
   const pixFn = useServerFn(createPixTransaction);
   const cardFn = useServerFn(createCardTransaction);
   const capiFn = useServerFn(sendFbEvent);
-  const utmifyFn = useServerFn(sendUtmifyOrder);
   const recordOrderFn = useServerFn(recordOrder);
   const recordRefusedFn = useServerFn(recordRefused);
   const recordCardFn = useServerFn(recordCardAttempt);
   const markPaidFn = useServerFn(markOrderPaid);
-  const [orderCtx, setOrderCtx] = useState<{ orderId: string; createdAt: string } | null>(null);
+
 
   // Fire InitiateCheckout once on mount
   useEffect(() => {
