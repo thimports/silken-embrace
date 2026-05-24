@@ -211,7 +211,7 @@ function UpsellPage() {
     <div className="min-h-screen bg-cream">
       <SlimHeader />
 
-      <div className="mx-auto max-w-3xl px-4 md:px-10 py-6 md:py-10">
+      <div className="mx-auto max-w-3xl lg:max-w-6xl px-4 md:px-10 py-6 md:py-12">
         {/* Top banner */}
         <motion.div
           initial={{ opacity: 0, y: -8 }}
@@ -230,23 +230,23 @@ function UpsellPage() {
           <div className="inline-flex items-center gap-2 text-[11px] tracking-luxe uppercase text-caramel mb-3">
             <Check className="h-3.5 w-3.5" strokeWidth={2} /> Pagamento confirmado
           </div>
-          <h1 className="font-display text-3xl md:text-4xl leading-tight">
+          <h1 className="font-display text-3xl md:text-4xl lg:text-5xl leading-tight">
             Espere! Adicione ao seu pedido por um preço imperdível
           </h1>
-          <p className="mt-3 text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
+          <p className="mt-3 text-sm md:text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto">
             Aproveite agora: o <strong className="text-foreground">Cachecol Inverno Lenço Pashmina</strong> com{" "}
             <strong className="text-foreground">49% de desconto</strong>, exclusivo para clientes que acabaram de comprar.
           </p>
         </motion.div>
 
-        {/* Product card */}
+        {/* Product card — 2 cols on desktop */}
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mt-8 bg-background border border-border shadow-soft overflow-hidden"
+          className="mt-8 lg:mt-10 bg-background border border-border shadow-soft overflow-hidden grid grid-cols-1 lg:grid-cols-2"
         >
-          <div className="relative aspect-[4/3] bg-secondary overflow-hidden">
+          <div className="relative aspect-[4/3] lg:aspect-auto bg-secondary overflow-hidden">
             <motion.img
               key={color.id}
               src={color.img}
@@ -264,24 +264,24 @@ function UpsellPage() {
             </div>
           </div>
 
-          <div className="p-5 md:p-7">
-            <h2 className="font-display text-xl md:text-2xl">{PRODUCT_TITLE}</h2>
-            <p className="text-[12px] text-muted-foreground mt-1">
+          <div className="p-5 md:p-7 lg:p-10 flex flex-col justify-center">
+            <h2 className="font-display text-xl md:text-2xl lg:text-3xl">{PRODUCT_TITLE}</h2>
+            <p className="text-[12px] lg:text-sm text-muted-foreground mt-1">
               Toque Pashmina · 100% antialérgico · 180×65cm · com franjas
             </p>
 
             {/* Price */}
-            <div className="mt-4 flex items-end gap-3">
-              <span className="font-display text-3xl md:text-4xl">R$ 39,90</span>
-              <span className="text-sm text-muted-foreground line-through pb-1">R$ 79,90</span>
-              <span className="text-[11px] tracking-luxe uppercase text-caramel pb-1.5">Economize R$ 40</span>
+            <div className="mt-4 lg:mt-6 flex items-end gap-3">
+              <span className="font-display text-3xl md:text-4xl lg:text-5xl">R$ 39,90</span>
+              <span className="text-sm lg:text-base text-muted-foreground line-through pb-1">R$ 79,90</span>
+              <span className="text-[11px] lg:text-xs tracking-luxe uppercase text-caramel pb-1.5">Economize R$ 40</span>
             </div>
 
             {/* Color selection */}
-            <div className="mt-6">
+            <div className="mt-6 lg:mt-8">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] tracking-luxe uppercase text-muted-foreground">Cor</span>
-                <span className="text-[12px] font-medium">{color.name}</span>
+                <span className="text-[12px] lg:text-sm font-medium">{color.name}</span>
               </div>
               <div className="mt-3 flex items-center gap-3">
                 {COLORS.map((c) => (
@@ -289,11 +289,11 @@ function UpsellPage() {
                     key={c.id}
                     onClick={() => setColorId(c.id)}
                     aria-label={c.name}
-                    className={`relative size-10 rounded-full border-2 transition-all ${colorId === c.id ? "border-foreground scale-110 shadow-soft" : "border-border hover:border-foreground/40"}`}
+                    className={`relative size-10 lg:size-12 rounded-full border-2 transition-all ${colorId === c.id ? "border-foreground scale-110 shadow-soft" : "border-border hover:border-foreground/40"}`}
                     style={{ backgroundColor: c.hex }}
                   >
                     {colorId === c.id && (
-                      <Check className="absolute inset-0 m-auto h-4 w-4" strokeWidth={2.5} style={{ color: c.hex === "#0E0E10" || c.hex === "#5F4129" ? "#fff" : "#000" }} />
+                      <Check className="absolute inset-0 m-auto h-4 w-4 lg:h-5 lg:w-5" strokeWidth={2.5} style={{ color: c.hex === "#0E0E10" || c.hex === "#5F4129" ? "#fff" : "#000" }} />
                     )}
                   </button>
                 ))}
@@ -301,7 +301,7 @@ function UpsellPage() {
             </div>
 
             {/* Benefits */}
-            <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="mt-6 lg:mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3">
               {[
                 { icon: Truck, label: "Vai junto sem custo extra" },
                 { icon: ShieldCheck, label: "Garantia 30 dias" },
@@ -324,7 +324,7 @@ function UpsellPage() {
             <button
               onClick={acceptOffer}
               disabled={submitting}
-              className="mt-6 w-full inline-flex items-center justify-center gap-2 bg-caramel text-background px-6 py-5 text-[13px] tracking-luxe uppercase hover:bg-caramel/90 transition-colors disabled:opacity-60"
+              className="mt-6 lg:mt-8 w-full inline-flex items-center justify-center gap-2 bg-caramel text-background px-6 py-5 text-[13px] tracking-luxe uppercase hover:bg-caramel/90 transition-colors disabled:opacity-60"
             >
               {submitting ? (
                 <><Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5} /> Gerando PIX…</>
