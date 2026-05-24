@@ -8,6 +8,8 @@ import { sendFbEvent } from "@/lib/fb-capi.functions";
 import { sendUtmifyOrder } from "@/lib/utmify.functions";
 import { fbTrack, getFbp, getFbc, newEventId } from "@/lib/fbpixel";
 import { getUtms } from "@/lib/utm";
+import { recordOrder, markOrderPaid } from "@/lib/tracking.functions";
+import { getSessionId } from "@/hooks/use-tracking";
 import { PixPayment } from "@/components/checkout/PixPayment";
 import { PaymentConfirmed } from "@/components/checkout/PaymentConfirmed";
 import scarfCamel from "@/assets/scarf-camel.png";
@@ -64,6 +66,8 @@ function UpsellPage() {
   const pixFn = useServerFn(createPixTransaction);
   const capiFn = useServerFn(sendFbEvent);
   const utmifyFn = useServerFn(sendUtmifyOrder);
+  const recordOrderFn = useServerFn(recordOrder);
+  const markPaidFn = useServerFn(markOrderPaid);
 
   useEffect(() => {
     try {
@@ -110,9 +114,18 @@ function UpsellPage() {
     return () => { cancelled = true; };
   }, [saved, preloadedPix, preloading, pixFn]);
 
-  const fireTracking = (tx: { id: number }, data: Saved) => {
+  const fireTracking = (tx: { id: number; amount: number; pix: { qrcode: string } }, data: Saved) => {
     const orderId = String(tx.id);
     const eventId = `purchase-pix-upsell-${tx.id}`;
+    recordOrderFn({ data: {
+      transactionId: tx.id,
+      customer: { name: data.customer.name, email: data.customer.email, phone: data.customer.phone, cpf: data.customer.document },
+      address: data.address,
+      amountCents: tx.amount,
+      pixQrcode: tx.pix.qrcode,
+      isUpsell: true,
+      sessionId: getSessionId(),
+    }}).catch(() => {});
     fbTrack("Purchase", { value: PRICE, currency: "BRL", content_ids: [PRODUCT_ID], content_type: "product", order_id: orderId }, { eventID: eventId });
     capiFn({
       data: {
@@ -235,7 +248,7 @@ function UpsellPage() {
             transaction={pixTx}
             productTitle={`${PRODUCT_TITLE} · ${color.name}`}
             productMeta={`Cor: ${color.name} · Tam. Único · Qtd: 1`}
-            onPaid={() => setPaid(true)}
+            onPaid={() => { markPaidFn({ data: { transactionId: pixTx.id } }).catch(() => {}); setPaid(true); }}
           />
         </div>
       </div>
