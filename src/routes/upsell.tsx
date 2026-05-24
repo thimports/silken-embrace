@@ -215,7 +215,12 @@ function UpsellPage() {
             transaction={pixTx}
             productTitle={`${PRODUCT_TITLE} · ${color.name}`}
             productMeta={`Cor: ${color.name} · Tam. Único · Qtd: 1`}
-            onPaid={() => { markPaidFn({ data: { transactionId: pixTx.id } }).catch(() => {}); setPaid(true); }}
+            onPaid={async () => {
+              // Aguarda markOrderPaid (dispara Utmify "paid" no servidor) antes de mudar a UI
+              try { await markPaidFn({ data: { transactionId: pixTx.id } }); } catch { /* segue */ }
+              setPaid(true);
+            }}
+
           />
         </div>
       </div>
