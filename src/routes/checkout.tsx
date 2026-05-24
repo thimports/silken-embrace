@@ -229,6 +229,8 @@ function CheckoutPage() {
   }, [pixSig, pay]);
 
   const firePixTracking = (tx: { id: number; amount: number }) => {
+    if (firedTxRef.current.has(tx.id)) return;
+    firedTxRef.current.add(tx.id);
     const createdAt = utcNow();
     const orderId = String(tx.id);
     setOrderCtx({ orderId, createdAt });
