@@ -65,10 +65,17 @@ function UpsellPage() {
 
   useEffect(() => {
     try {
+      const paidFlag = sessionStorage.getItem("lumiere_upsell_paid");
       const raw = sessionStorage.getItem("lumiere_upsell");
-      if (raw) setSaved(JSON.parse(raw));
-    } catch {}
-  }, []);
+      if (paidFlag !== "1" || !raw) {
+        navigate({ to: "/" });
+        return;
+      }
+      setSaved(JSON.parse(raw));
+    } catch {
+      navigate({ to: "/" });
+    }
+  }, [navigate]);
 
   // ViewContent on mount
   useEffect(() => {
