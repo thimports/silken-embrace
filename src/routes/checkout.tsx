@@ -212,6 +212,8 @@ function CheckoutPage() {
             const out = { id: tx.id, amount: tx.amount, pix: tx.pix };
             setPixTx(out);
             lastSigRef.current = pixSig;
+            // Dispara Purchase assim que o PIX é criado (pedido pendente no gateway)
+            firePixTracking(out);
             return out;
           }
           return null;
