@@ -405,10 +405,13 @@ function CheckoutPage() {
             }
             // Salva dados para o upsell e redireciona (apenas após PIX pago)
             try {
-              sessionStorage.setItem("lumiere_upsell", JSON.stringify({
+              const payload = JSON.stringify({
                 customer: buildCustomer(),
                 address: buildAddress(),
-              }));
+              });
+              localStorage.setItem("lumiere_upsell", payload);
+              sessionStorage.setItem("lumiere_upsell", payload);
+              localStorage.setItem("lumiere_upsell_paid", "1");
               sessionStorage.setItem("lumiere_upsell_paid", "1");
             } catch {}
             navigate({ to: "/upsell" });
