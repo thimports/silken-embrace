@@ -39,8 +39,8 @@ const PRODUCT_TITLE = "Cachecol Inverno Lenço Pashmina";
 const onlyDigits = (s: string) => (s || "").replace(/\D/g, "");
 
 type Saved = {
-  customer: { name: string; email: string; phone: string; cpf: string };
-  address: { cep: string; street: string; number: string; complement?: string; city: string; state: string };
+  customer: { name: string; email: string; phone: string; document: string };
+  address: { street: string; streetNumber: string; complement?: string; zipCode: string; city: string; state: string };
 };
 
 function utcNow() {
@@ -115,10 +115,10 @@ function UpsellPage() {
             email: saved.customer.email,
             phone: saved.customer.phone,
             name: saved.customer.name,
-            cpf: saved.customer.cpf,
+            cpf: saved.customer.document,
             city: saved.address.city,
             state: saved.address.state,
-            zip: saved.address.cep,
+            zip: saved.address.zipCode,
           },
           customData: { order_id: orderId, payment_method: "pix", upsell: true },
         },
@@ -138,7 +138,7 @@ function UpsellPage() {
             name: saved.customer.name,
             email: saved.customer.email,
             phone: onlyDigits(saved.customer.phone) || null,
-            document: onlyDigits(saved.customer.cpf) || null,
+            document: onlyDigits(saved.customer.document) || null,
             country: "BR",
           },
           products: [{
