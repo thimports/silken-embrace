@@ -38,18 +38,11 @@ const PRICE = 39.9;
 const PRODUCT_ID = "lumiere-cachecol-pashmina";
 const PRODUCT_TITLE = "Cachecol Inverno Lenço Pashmina";
 
-const onlyDigits = (s: string) => (s || "").replace(/\D/g, "");
-
 type Saved = {
   customer: { name: string; email: string; phone: string; document: string };
   address: { street: string; streetNumber: string; complement?: string; zipCode: string; city: string; state: string };
 };
 
-function utcNow() {
-  const d = new Date();
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
-}
 
 function UpsellPage() {
   const navigate = useNavigate();
