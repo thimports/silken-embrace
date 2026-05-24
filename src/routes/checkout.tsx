@@ -62,6 +62,7 @@ function CheckoutPage() {
   const [prewarming, setPrewarming] = useState(false);
   const finalizedRef = useRef(false);
   const lastSigRef = useRef<string>("");
+  const firedTxRef = useRef<Set<number>>(new Set());
   const pixPromiseRef = useRef<Promise<{ id: number; amount: number; pix: { qrcode: string; expirationDate?: string } } | null> | null>(null);
 
   useEffect(() => {
