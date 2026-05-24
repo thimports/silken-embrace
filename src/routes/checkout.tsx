@@ -389,6 +389,20 @@ function CheckoutPage() {
         <div className="mx-auto max-w-[1280px] px-4 md:px-10 py-8 md:py-12">
           <PixPayment transaction={pixTx} productTitle={PRODUCT_TITLE} productMeta={PRODUCT_META} onPaid={() => {
             setPaid(true);
+            const paidOrderId = orderCtx?.orderId ?? String(pixTx.id);
+            const paidEventId = `purchase-pix-paid-${paidOrderId}`;
+            fbTrack("Purchase", { value: total, currency: "BRL", content_ids: ["lumiere-meia-2pk"], content_type: "product", order_id: paidOrderId, status: "paid" }, { eventID: paidEventId });
+            capiFn({ data: {
+              eventName: "Purchase",
+              eventId: paidEventId,
+              eventSourceUrl: typeof window !== "undefined" ? window.location.href : undefined,
+              value: total,
+              currency: "BRL",
+              fbp: getFbp(),
+              fbc: getFbc(),
+              user: { email: f.email, phone: f.phone, name: f.name, cpf: f.cpf, city: f.city, state: f.state, zip: f.cep },
+              customData: { order_id: paidOrderId, payment_method: "pix", status: "paid" },
+            }}).catch(() => {});
             if (orderCtx) {
               utmifyFn({ data: buildUtmifyOrder({
                 orderId: orderCtx.orderId,
