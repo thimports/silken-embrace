@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Check, ChevronLeft, Lock, Shield, Truck, CreditCard, QrCode, RotateCcw, Loader2, AlertCircle } from "lucide-react";
@@ -50,6 +50,7 @@ function Field({ label, ...p }: React.InputHTMLAttributes<HTMLInputElement> & { 
 }
 
 function CheckoutPage() {
+  const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [pay, setPay] = useState<"pix" | "card">("pix");
   const [cepLoading, setCepLoading] = useState(false);
@@ -393,7 +394,6 @@ function CheckoutPage() {
       ) : showPix && pixTx ? (
         <div className="mx-auto max-w-[1280px] px-4 md:px-10 py-8 md:py-12">
           <PixPayment transaction={pixTx} productTitle={PRODUCT_TITLE} productMeta={PRODUCT_META} onPaid={() => {
-            setPaid(true);
             if (orderCtx) {
               utmifyFn({ data: buildUtmifyOrder({
                 orderId: orderCtx.orderId,
@@ -403,6 +403,14 @@ function CheckoutPage() {
                 approvedDate: utcNow(),
               }) }).catch(() => {});
             }
+            // Salva dados para o upsell e redireciona
+            try {
+              sessionStorage.setItem("lumiere_upsell", JSON.stringify({
+                customer: buildCustomer(),
+                address: buildAddress(),
+              }));
+            } catch {}
+            navigate({ to: "/upsell" });
           }} />
         </div>
       ) : (
