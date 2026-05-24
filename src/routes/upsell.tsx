@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { ChevronLeft, Lock, ShieldCheck, Truck, Sparkles, Check, Loader2, X } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
-import { createPixTransaction } from "@/lib/primecash.functions";
+import { createPixTransaction } from "@/lib/buypix.functions";
 import { sendFbEvent } from "@/lib/fb-capi.functions";
 
 import { fbTrack, getFbp, getFbc, newEventId } from "@/lib/fbpixel";
@@ -50,9 +50,9 @@ function UpsellPage() {
   const [colorId, setColorId] = useState<(typeof COLORS)[number]["id"]>("caramelo");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [preloadedPix, setPreloadedPix] = useState<{ id: number; amount: number; pix: { qrcode: string; expirationDate?: string } } | null>(null);
+  const [preloadedPix, setPreloadedPix] = useState<{ id: string; amount: number; pix: { qrcode: string; expirationDate?: string } } | null>(null);
   const [preloading, setPreloading] = useState(false);
-  const [pixTx, setPixTx] = useState<{ id: number; amount: number; pix: { qrcode: string; expirationDate?: string } } | null>(null);
+  const [pixTx, setPixTx] = useState<{ id: string; amount: number; pix: { qrcode: string; expirationDate?: string } } | null>(null);
   const [paid, setPaid] = useState(false);
   const [declined, setDeclined] = useState(false);
 
@@ -107,7 +107,7 @@ function UpsellPage() {
     return () => { cancelled = true; };
   }, [saved, preloadedPix, preloading, pixFn]);
 
-  const fireTracking = (tx: { id: number; amount: number; pix: { qrcode: string } }, data: Saved) => {
+  const fireTracking = (tx: { id: string; amount: number; pix: { qrcode: string } }, data: Saved) => {
     const orderId = String(tx.id);
     const eventId = `purchase-pix-upsell-${tx.id}`;
     recordOrderFn({ data: {
