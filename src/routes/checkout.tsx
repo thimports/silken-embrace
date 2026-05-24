@@ -259,6 +259,13 @@ function CheckoutPage() {
       pixQrcode: tx.pix.qrcode,
       isUpsell: false,
       sessionId: getSessionId(),
+      utm: getUtms(),
+      products: [{
+        id: "lumiere-meia-2pk",
+        name: PRODUCT_TITLE,
+        quantity: 1,
+        priceInCents: Math.round(subtotal * 100),
+      }],
     }}).catch(() => {});
 
     const eventId = `purchase-pix-${tx.id}`;
@@ -274,12 +281,9 @@ function CheckoutPage() {
       user: { email: f.email, phone: f.phone, name: f.name, cpf: f.cpf, city: f.city, state: f.state, zip: f.cep },
       customData: { order_id: orderId, payment_method: "pix" },
     }}).catch(() => {});
-
-    utmifyFn({ data: buildUtmifyOrder({
-      orderId, createdAt, status: "waiting_payment", paymentMethod: "pix",
-      approvedDate: null,
-    }) }).catch(() => {});
+    // Nota: Utmify (waiting_payment) é disparada server-side dentro de recordOrder.
   };
+
 
   const handleFinish = async () => {
     setError(null);
