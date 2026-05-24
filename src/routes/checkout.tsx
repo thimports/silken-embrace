@@ -58,6 +58,7 @@ function CheckoutPage() {
   const [pixTx, setPixTx] = useState<{ id: number; amount: number; pix: { qrcode: string; expirationDate?: string } } | null>(null);
   const [cardResult, setCardResult] = useState<{ status: string; refusedReason?: any } | null>(null);
   const [paid, setPaid] = useState(false);
+  const [showPix, setShowPix] = useState(false);
   const [prewarming, setPrewarming] = useState(false);
   const finalizedRef = useRef(false);
   const lastSigRef = useRef<string>("");
@@ -281,6 +282,7 @@ function CheckoutPage() {
           lastSigRef.current = pixSig;
         }
         finalizedRef.current = true;
+        setShowPix(true);
         firePixTracking(tx);
       } else {
         const [mm, yy] = f.cardExp.split("/");
@@ -383,7 +385,7 @@ function CheckoutPage() {
         <div className="mx-auto max-w-[1280px] px-4 md:px-10 py-8 md:py-12">
           <PaymentConfirmed />
         </div>
-      ) : pixTx ? (
+      ) : showPix && pixTx ? (
         <div className="mx-auto max-w-[1280px] px-4 md:px-10 py-8 md:py-12">
           <PixPayment transaction={pixTx} productTitle={PRODUCT_TITLE} productMeta={PRODUCT_META} onPaid={() => {
             setPaid(true);
