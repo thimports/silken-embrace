@@ -141,7 +141,7 @@ export const adminCards = createServerFn({ method: "GET" }).handler(async () => 
 
 export const adminLive = createServerFn({ method: "GET" }).handler(async () => {
   await requireAdmin();
-  const cutoff = new Date(Date.now() - 45 * 1000).toISOString();
+  const cutoff = new Date(Date.now() - 30 * 1000).toISOString();
   const { data } = await supabaseAdmin
     .from("live_presence")
     .select("*")
