@@ -14,7 +14,207 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      card_attempts: {
+        Row: {
+          address: Json | null
+          amount_cents: number | null
+          created_at: string
+          customer_cpf: string | null
+          customer_email: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          id: number
+          ip: string | null
+          session_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          address?: Json | null
+          amount_cents?: number | null
+          created_at?: string
+          customer_cpf?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          id?: number
+          ip?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          address?: Json | null
+          amount_cents?: number | null
+          created_at?: string
+          customer_cpf?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          id?: number
+          ip?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      funnel_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: number
+          ip: string | null
+          metadata: Json | null
+          page: string | null
+          session_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: number
+          ip?: string | null
+          metadata?: Json | null
+          page?: string | null
+          session_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: number
+          ip?: string | null
+          metadata?: Json | null
+          page?: string | null
+          session_id?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      live_presence: {
+        Row: {
+          ip: string | null
+          last_seen: string
+          page: string | null
+          session_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          ip?: string | null
+          last_seen?: string
+          page?: string | null
+          session_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          ip?: string | null
+          last_seen?: string
+          page?: string | null
+          session_id?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          address: Json | null
+          amount_cents: number
+          created_at: string
+          customer_cpf: string | null
+          customer_email: string
+          customer_name: string
+          customer_phone: string | null
+          id: number
+          ip: string | null
+          is_upsell: boolean | null
+          paid_at: string | null
+          payment_method: string
+          pix_qrcode: string | null
+          session_id: string | null
+          status: string
+          transaction_id: number | null
+          user_agent: string | null
+        }
+        Insert: {
+          address?: Json | null
+          amount_cents: number
+          created_at?: string
+          customer_cpf?: string | null
+          customer_email: string
+          customer_name: string
+          customer_phone?: string | null
+          id?: number
+          ip?: string | null
+          is_upsell?: boolean | null
+          paid_at?: string | null
+          payment_method?: string
+          pix_qrcode?: string | null
+          session_id?: string | null
+          status?: string
+          transaction_id?: number | null
+          user_agent?: string | null
+        }
+        Update: {
+          address?: Json | null
+          amount_cents?: number
+          created_at?: string
+          customer_cpf?: string | null
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string | null
+          id?: number
+          ip?: string | null
+          is_upsell?: boolean | null
+          paid_at?: string | null
+          payment_method?: string
+          pix_qrcode?: string | null
+          session_id?: string | null
+          status?: string
+          transaction_id?: number | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      refused_payments: {
+        Row: {
+          amount_cents: number | null
+          created_at: string
+          customer_cpf: string | null
+          customer_email: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          error_message: string | null
+          id: number
+          ip: string | null
+          session_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          amount_cents?: number | null
+          created_at?: string
+          customer_cpf?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          error_message?: string | null
+          id?: number
+          ip?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          amount_cents?: number | null
+          created_at?: string
+          customer_cpf?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          error_message?: string | null
+          id?: number
+          ip?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
