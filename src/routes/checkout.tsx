@@ -205,9 +205,8 @@ function CheckoutPage() {
   const firePixTracking = (tx: { id: number; amount: number; pix: { qrcode: string } }) => {
     if (firedTxRef.current.has(tx.id)) return;
     firedTxRef.current.add(tx.id);
-    const createdAt = utcNow();
     const orderId = String(tx.id);
-    setOrderCtx({ orderId, createdAt });
+
 
     track("purchase", { orderId, amount: tx.amount });
     recordOrderFn({ data: {
