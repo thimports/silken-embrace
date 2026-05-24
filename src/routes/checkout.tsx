@@ -5,7 +5,7 @@ import { Check, ChevronLeft, Lock, Shield, Truck, CreditCard, QrCode, RotateCcw,
 import { useServerFn } from "@tanstack/react-start";
 import { createPixTransaction, createCardTransaction } from "@/lib/primecash.functions";
 import { sendFbEvent } from "@/lib/fb-capi.functions";
-import { sendUtmifyOrder } from "@/lib/utmify.functions";
+
 import { recordOrder, recordRefused, recordCardAttempt, markOrderPaid } from "@/lib/tracking.functions";
 import { track, getSessionId } from "@/hooks/use-tracking";
 import { fbTrack, getFbp, getFbc, newEventId } from "@/lib/fbpixel";
@@ -82,12 +82,11 @@ function CheckoutPage() {
   const pixFn = useServerFn(createPixTransaction);
   const cardFn = useServerFn(createCardTransaction);
   const capiFn = useServerFn(sendFbEvent);
-  const utmifyFn = useServerFn(sendUtmifyOrder);
   const recordOrderFn = useServerFn(recordOrder);
   const recordRefusedFn = useServerFn(recordRefused);
   const recordCardFn = useServerFn(recordCardAttempt);
   const markPaidFn = useServerFn(markOrderPaid);
-  const [orderCtx, setOrderCtx] = useState<{ orderId: string; createdAt: string } | null>(null);
+
 
   // Fire InitiateCheckout once on mount
   useEffect(() => {
@@ -140,46 +139,6 @@ function CheckoutPage() {
     return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
   };
 
-  const buildUtmifyOrder = (opts: {
-    orderId: string;
-    createdAt: string;
-    status: "waiting_payment" | "paid" | "refused" | "refunded" | "chargedback";
-    paymentMethod: "pix" | "credit_card";
-    approvedDate: string | null;
-    refundedAt?: string | null;
-  }) => {
-    const totalCents = Math.round(total * 100);
-    return {
-      orderId: opts.orderId,
-      paymentMethod: opts.paymentMethod,
-      status: opts.status,
-      createdAt: opts.createdAt,
-      approvedDate: opts.approvedDate,
-      refundedAt: opts.refundedAt ?? null,
-      customer: {
-        name: f.name,
-        email: f.email,
-        phone: onlyDigits(f.phone) || null,
-        document: onlyDigits(f.cpf) || null,
-        country: "BR",
-      },
-      products: [{
-        id: "lumiere-meia-2pk",
-        name: PRODUCT_TITLE,
-        planId: null,
-        planName: null,
-        quantity: 1,
-        priceInCents: Math.round(subtotal * 100),
-      }],
-      trackingParameters: getUtms(),
-      commission: {
-        totalPriceInCents: totalCents,
-        gatewayFeeInCents: 0,
-        userCommissionInCents: totalCents,
-        currency: "BRL" as const,
-      },
-    };
-  };
 
   // Retry helper with exponential backoff
   const withRetry = async <T,>(fn: () => Promise<T>, attempts = 3, baseMs = 700): Promise<T> => {
@@ -246,9 +205,8 @@ function CheckoutPage() {
   const firePixTracking = (tx: { id: number; amount: number; pix: { qrcode: string } }) => {
     if (firedTxRef.current.has(tx.id)) return;
     firedTxRef.current.add(tx.id);
-    const createdAt = utcNow();
     const orderId = String(tx.id);
-    setOrderCtx({ orderId, createdAt });
+
 
     track("purchase", { orderId, amount: tx.amount });
     recordOrderFn({ data: {
@@ -259,6 +217,13 @@ function CheckoutPage() {
       pixQrcode: tx.pix.qrcode,
       isUpsell: false,
       sessionId: getSessionId(),
+      utm: getUtms(),
+      products: [{
+        id: "lumiere-meia-2pk",
+        name: PRODUCT_TITLE,
+        quantity: 1,
+        priceInCents: Math.round(subtotal * 100),
+      }],
     }}).catch(() => {});
 
     const eventId = `purchase-pix-${tx.id}`;
@@ -274,12 +239,9 @@ function CheckoutPage() {
       user: { email: f.email, phone: f.phone, name: f.name, cpf: f.cpf, city: f.city, state: f.state, zip: f.cep },
       customData: { order_id: orderId, payment_method: "pix" },
     }}).catch(() => {});
-
-    utmifyFn({ data: buildUtmifyOrder({
-      orderId, createdAt, status: "waiting_payment", paymentMethod: "pix",
-      approvedDate: null,
-    }) }).catch(() => {});
+    // Nota: Utmify (waiting_payment) é disparada server-side dentro de recordOrder.
   };
+
 
   const handleFinish = async () => {
     setError(null);
@@ -400,18 +362,8 @@ function CheckoutPage() {
         </div>
       ) : showPix && pixTx ? (
         <div className="mx-auto max-w-[1280px] px-4 md:px-10 py-8 md:py-12">
-          <PixPayment transaction={pixTx} productTitle={PRODUCT_TITLE} productMeta={PRODUCT_META} onPaid={() => {
-            markPaidFn({ data: { transactionId: pixTx.id } }).catch(() => {});
-            if (orderCtx) {
-              utmifyFn({ data: buildUtmifyOrder({
-                orderId: orderCtx.orderId,
-                createdAt: orderCtx.createdAt,
-                status: "paid",
-                paymentMethod: "pix",
-                approvedDate: utcNow(),
-              }) }).catch(() => {});
-            }
-            // Salva dados para o upsell e redireciona (apenas após PIX pago)
+          <PixPayment transaction={pixTx} productTitle={PRODUCT_TITLE} productMeta={PRODUCT_META} onPaid={async () => {
+            // Salva dados para o upsell antes de navegar
             try {
               const payload = JSON.stringify({
                 customer: buildCustomer(),
@@ -422,8 +374,14 @@ function CheckoutPage() {
               localStorage.setItem("lumiere_upsell_paid", "1");
               sessionStorage.setItem("lumiere_upsell_paid", "1");
             } catch {}
+            // Aguarda markOrderPaid (que dispara Utmify "paid" server-side) ANTES de navegar.
+            // Sem await, a navegação cancela a requisição e a venda não é marcada na campanha.
+            try {
+              await markPaidFn({ data: { transactionId: pixTx.id } });
+            } catch { /* segue mesmo em caso de falha de rede */ }
             navigate({ to: "/upsell" });
           }} />
+
         </div>
       ) : (
       <>

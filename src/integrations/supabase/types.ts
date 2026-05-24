@@ -130,6 +130,7 @@ export type Database = {
           address: Json | null
           amount_cents: number
           created_at: string
+          created_at_utc: string | null
           customer_cpf: string | null
           customer_email: string
           customer_name: string
@@ -140,15 +141,18 @@ export type Database = {
           paid_at: string | null
           payment_method: string
           pix_qrcode: string | null
+          products: Json | null
           session_id: string | null
           status: string
           transaction_id: number | null
           user_agent: string | null
+          utm: Json | null
         }
         Insert: {
           address?: Json | null
           amount_cents: number
           created_at?: string
+          created_at_utc?: string | null
           customer_cpf?: string | null
           customer_email: string
           customer_name: string
@@ -159,15 +163,18 @@ export type Database = {
           paid_at?: string | null
           payment_method?: string
           pix_qrcode?: string | null
+          products?: Json | null
           session_id?: string | null
           status?: string
           transaction_id?: number | null
           user_agent?: string | null
+          utm?: Json | null
         }
         Update: {
           address?: Json | null
           amount_cents?: number
           created_at?: string
+          created_at_utc?: string | null
           customer_cpf?: string | null
           customer_email?: string
           customer_name?: string
@@ -178,10 +185,12 @@ export type Database = {
           paid_at?: string | null
           payment_method?: string
           pix_qrcode?: string | null
+          products?: Json | null
           session_id?: string | null
           status?: string
           transaction_id?: number | null
           user_agent?: string | null
+          utm?: Json | null
         }
         Relationships: []
       }

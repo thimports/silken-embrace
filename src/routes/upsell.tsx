@@ -5,7 +5,7 @@ import { ChevronLeft, Lock, ShieldCheck, Truck, Sparkles, Check, Loader2, X } fr
 import { useServerFn } from "@tanstack/react-start";
 import { createPixTransaction } from "@/lib/primecash.functions";
 import { sendFbEvent } from "@/lib/fb-capi.functions";
-import { sendUtmifyOrder } from "@/lib/utmify.functions";
+
 import { fbTrack, getFbp, getFbc, newEventId } from "@/lib/fbpixel";
 import { getUtms } from "@/lib/utm";
 import { recordOrder, markOrderPaid } from "@/lib/tracking.functions";
@@ -38,18 +38,11 @@ const PRICE = 39.9;
 const PRODUCT_ID = "lumiere-cachecol-pashmina";
 const PRODUCT_TITLE = "Cachecol Inverno Lenço Pashmina";
 
-const onlyDigits = (s: string) => (s || "").replace(/\D/g, "");
-
 type Saved = {
   customer: { name: string; email: string; phone: string; document: string };
   address: { street: string; streetNumber: string; complement?: string; zipCode: string; city: string; state: string };
 };
 
-function utcNow() {
-  const d = new Date();
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
-}
 
 function UpsellPage() {
   const navigate = useNavigate();
@@ -65,7 +58,7 @@ function UpsellPage() {
 
   const pixFn = useServerFn(createPixTransaction);
   const capiFn = useServerFn(sendFbEvent);
-  const utmifyFn = useServerFn(sendUtmifyOrder);
+  
   const recordOrderFn = useServerFn(recordOrder);
   const markPaidFn = useServerFn(markOrderPaid);
 
@@ -125,6 +118,13 @@ function UpsellPage() {
       pixQrcode: tx.pix.qrcode,
       isUpsell: true,
       sessionId: getSessionId(),
+      utm: getUtms(),
+      products: [{
+        id: PRODUCT_ID,
+        name: `${PRODUCT_TITLE} · ${color.name}`,
+        quantity: 1,
+        priceInCents: Math.round(PRICE * 100),
+      }],
     }}).catch(() => {});
     fbTrack("Purchase", { value: PRICE, currency: "BRL", content_ids: [PRODUCT_ID], content_type: "product", order_id: orderId }, { eventID: eventId });
     capiFn({
@@ -148,42 +148,9 @@ function UpsellPage() {
         customData: { order_id: orderId, payment_method: "pix", upsell: true },
       },
     }).catch(() => {});
-
-    const createdAt = utcNow();
-    const totalCents = Math.round(PRICE * 100);
-    utmifyFn({
-      data: {
-        orderId,
-        paymentMethod: "pix",
-        status: "waiting_payment",
-        createdAt,
-        approvedDate: null,
-        refundedAt: null,
-        customer: {
-          name: data.customer.name,
-          email: data.customer.email,
-          phone: onlyDigits(data.customer.phone) || null,
-          document: onlyDigits(data.customer.document) || null,
-          country: "BR",
-        },
-        products: [{
-          id: PRODUCT_ID,
-          name: `${PRODUCT_TITLE} · ${color.name}`,
-          planId: null,
-          planName: null,
-          quantity: 1,
-          priceInCents: totalCents,
-        }],
-        trackingParameters: getUtms(),
-        commission: {
-          totalPriceInCents: totalCents,
-          gatewayFeeInCents: 0,
-          userCommissionInCents: totalCents,
-          currency: "BRL" as const,
-        },
-      },
-    }).catch(() => {});
+    // Utmify (waiting_payment + paid) é disparada server-side dentro de recordOrder/markOrderPaid.
   };
+
 
   const acceptOffer = async () => {
     setError(null);
@@ -248,7 +215,12 @@ function UpsellPage() {
             transaction={pixTx}
             productTitle={`${PRODUCT_TITLE} · ${color.name}`}
             productMeta={`Cor: ${color.name} · Tam. Único · Qtd: 1`}
-            onPaid={() => { markPaidFn({ data: { transactionId: pixTx.id } }).catch(() => {}); setPaid(true); }}
+            onPaid={async () => {
+              // Aguarda markOrderPaid (dispara Utmify "paid" no servidor) antes de mudar a UI
+              try { await markPaidFn({ data: { transactionId: pixTx.id } }); } catch { /* segue */ }
+              setPaid(true);
+            }}
+
           />
         </div>
       </div>
