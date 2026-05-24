@@ -65,17 +65,12 @@ function UpsellPage() {
 
   useEffect(() => {
     try {
-      const paidFlag = sessionStorage.getItem("lumiere_upsell_paid");
-      const raw = sessionStorage.getItem("lumiere_upsell");
-      if (paidFlag !== "1" || !raw) {
-        navigate({ to: "/" });
-        return;
-      }
-      setSaved(JSON.parse(raw));
+      const raw = localStorage.getItem("lumiere_upsell") || sessionStorage.getItem("lumiere_upsell");
+      if (raw) setSaved(JSON.parse(raw));
     } catch {
-      navigate({ to: "/" });
+      /* ignore — mantém a tela do upsell mesmo sem dados salvos */
     }
-  }, [navigate]);
+  }, []);
 
   // ViewContent on mount
   useEffect(() => {
