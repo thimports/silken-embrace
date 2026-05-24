@@ -5,7 +5,7 @@ import { ChevronLeft, Lock, ShieldCheck, Truck, Sparkles, Check, Loader2, X } fr
 import { useServerFn } from "@tanstack/react-start";
 import { createPixTransaction } from "@/lib/primecash.functions";
 import { sendFbEvent } from "@/lib/fb-capi.functions";
-import { sendUtmifyOrder } from "@/lib/utmify.functions";
+
 import { fbTrack, getFbp, getFbc, newEventId } from "@/lib/fbpixel";
 import { getUtms } from "@/lib/utm";
 import { recordOrder, markOrderPaid } from "@/lib/tracking.functions";
