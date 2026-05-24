@@ -44,7 +44,7 @@ function LivePage() {
         </div>
         <div>
           <h1 className="text-2xl font-semibold text-neutral-900">Ao Vivo</h1>
-          <p className="text-sm text-neutral-500">Atualiza a cada 5s · sessões ativas nos últimos 45s</p>
+          <p className="text-sm text-neutral-500">Atualiza a cada 5s · sessões ativas nos últimos 30s</p>
         </div>
       </div>
 
