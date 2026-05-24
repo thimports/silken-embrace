@@ -139,46 +139,6 @@ function CheckoutPage() {
     return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
   };
 
-  const buildUtmifyOrder = (opts: {
-    orderId: string;
-    createdAt: string;
-    status: "waiting_payment" | "paid" | "refused" | "refunded" | "chargedback";
-    paymentMethod: "pix" | "credit_card";
-    approvedDate: string | null;
-    refundedAt?: string | null;
-  }) => {
-    const totalCents = Math.round(total * 100);
-    return {
-      orderId: opts.orderId,
-      paymentMethod: opts.paymentMethod,
-      status: opts.status,
-      createdAt: opts.createdAt,
-      approvedDate: opts.approvedDate,
-      refundedAt: opts.refundedAt ?? null,
-      customer: {
-        name: f.name,
-        email: f.email,
-        phone: onlyDigits(f.phone) || null,
-        document: onlyDigits(f.cpf) || null,
-        country: "BR",
-      },
-      products: [{
-        id: "lumiere-meia-2pk",
-        name: PRODUCT_TITLE,
-        planId: null,
-        planName: null,
-        quantity: 1,
-        priceInCents: Math.round(subtotal * 100),
-      }],
-      trackingParameters: getUtms(),
-      commission: {
-        totalPriceInCents: totalCents,
-        gatewayFeeInCents: 0,
-        userCommissionInCents: totalCents,
-        currency: "BRL" as const,
-      },
-    };
-  };
 
   // Retry helper with exponential backoff
   const withRetry = async <T,>(fn: () => Promise<T>, attempts = 3, baseMs = 700): Promise<T> => {
