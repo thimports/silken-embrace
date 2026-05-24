@@ -55,6 +55,8 @@ function UpsellPage() {
   const [colorId, setColorId] = useState<(typeof COLORS)[number]["id"]>("caramelo");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [preloadedPix, setPreloadedPix] = useState<{ id: number; amount: number; pix: { qrcode: string; expirationDate?: string } } | null>(null);
+  const [preloading, setPreloading] = useState(false);
   const [pixTx, setPixTx] = useState<{ id: number; amount: number; pix: { qrcode: string; expirationDate?: string } } | null>(null);
   const [paid, setPaid] = useState(false);
   const [declined, setDeclined] = useState(false);
@@ -80,6 +82,96 @@ function UpsellPage() {
 
   const color = useMemo(() => COLORS.find((c) => c.id === colorId)!, [colorId]);
 
+  // Pre-generate PIX in background as soon as we have customer data — only show after user clicks
+  useEffect(() => {
+    if (!saved || preloadedPix || preloading) return;
+    let cancelled = false;
+    setPreloading(true);
+    (async () => {
+      try {
+        const tx = await pixFn({
+          data: {
+            amount: Math.round(PRICE * 100),
+            customer: saved.customer,
+            items: [{ title: PRODUCT_TITLE, unitPrice: Math.round(PRICE * 100), quantity: 1, tangible: true }],
+            address: saved.address,
+          },
+        });
+        if (cancelled) return;
+        if (tx?.pix?.qrcode) {
+          setPreloadedPix({ id: tx.id, amount: tx.amount, pix: tx.pix });
+        }
+      } catch {
+        /* silencioso — usuário pode tentar via botão */
+      } finally {
+        if (!cancelled) setPreloading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [saved, preloadedPix, preloading, pixFn]);
+
+  const fireTracking = (tx: { id: number }, data: Saved) => {
+    const orderId = String(tx.id);
+    const eventId = `purchase-pix-upsell-${tx.id}`;
+    fbTrack("Purchase", { value: PRICE, currency: "BRL", content_ids: [PRODUCT_ID], content_type: "product", order_id: orderId }, { eventID: eventId });
+    capiFn({
+      data: {
+        eventName: "Purchase",
+        eventId,
+        eventSourceUrl: typeof window !== "undefined" ? window.location.href : undefined,
+        value: PRICE,
+        currency: "BRL",
+        fbp: getFbp(),
+        fbc: getFbc(),
+        user: {
+          email: data.customer.email,
+          phone: data.customer.phone,
+          name: data.customer.name,
+          cpf: data.customer.document,
+          city: data.address.city,
+          state: data.address.state,
+          zip: data.address.zipCode,
+        },
+        customData: { order_id: orderId, payment_method: "pix", upsell: true },
+      },
+    }).catch(() => {});
+
+    const createdAt = utcNow();
+    const totalCents = Math.round(PRICE * 100);
+    utmifyFn({
+      data: {
+        orderId,
+        paymentMethod: "pix",
+        status: "waiting_payment",
+        createdAt,
+        approvedDate: null,
+        refundedAt: null,
+        customer: {
+          name: data.customer.name,
+          email: data.customer.email,
+          phone: onlyDigits(data.customer.phone) || null,
+          document: onlyDigits(data.customer.document) || null,
+          country: "BR",
+        },
+        products: [{
+          id: PRODUCT_ID,
+          name: `${PRODUCT_TITLE} · ${color.name}`,
+          planId: null,
+          planName: null,
+          quantity: 1,
+          priceInCents: totalCents,
+        }],
+        trackingParameters: getUtms(),
+        commission: {
+          totalPriceInCents: totalCents,
+          gatewayFeeInCents: 0,
+          userCommissionInCents: totalCents,
+          currency: "BRL" as const,
+        },
+      },
+    }).catch(() => {});
+  };
+
   const acceptOffer = async () => {
     setError(null);
     setSubmitting(true);
@@ -96,6 +188,12 @@ function UpsellPage() {
       }
       if (!data) throw new Error("Não encontramos seus dados. Recarregue a página do checkout.");
 
+      if (preloadedPix) {
+        setPixTx(preloadedPix);
+        fireTracking(preloadedPix, data);
+        return;
+      }
+
       const tx = await pixFn({
         data: {
           amount: Math.round(PRICE * 100),
@@ -107,67 +205,7 @@ function UpsellPage() {
       if (!tx?.pix?.qrcode) throw new Error("Não recebemos o código PIX. Tente novamente.");
       const out = { id: tx.id, amount: tx.amount, pix: tx.pix };
       setPixTx(out);
-
-      // Fire Purchase (pending) for upsell
-      const orderId = String(tx.id);
-      const eventId = `purchase-pix-upsell-${tx.id}`;
-      fbTrack("Purchase", { value: PRICE, currency: "BRL", content_ids: [PRODUCT_ID], content_type: "product", order_id: orderId }, { eventID: eventId });
-      capiFn({
-        data: {
-          eventName: "Purchase",
-          eventId,
-          eventSourceUrl: typeof window !== "undefined" ? window.location.href : undefined,
-          value: PRICE,
-          currency: "BRL",
-          fbp: getFbp(),
-          fbc: getFbc(),
-          user: {
-            email: data.customer.email,
-            phone: data.customer.phone,
-            name: data.customer.name,
-            cpf: data.customer.document,
-            city: data.address.city,
-            state: data.address.state,
-            zip: data.address.zipCode,
-          },
-          customData: { order_id: orderId, payment_method: "pix", upsell: true },
-        },
-      }).catch(() => {});
-
-      const createdAt = utcNow();
-      const totalCents = Math.round(PRICE * 100);
-      utmifyFn({
-        data: {
-          orderId,
-          paymentMethod: "pix",
-          status: "waiting_payment",
-          createdAt,
-          approvedDate: null,
-          refundedAt: null,
-          customer: {
-            name: data.customer.name,
-            email: data.customer.email,
-            phone: onlyDigits(data.customer.phone) || null,
-            document: onlyDigits(data.customer.document) || null,
-            country: "BR",
-          },
-          products: [{
-            id: PRODUCT_ID,
-            name: `${PRODUCT_TITLE} · ${color.name}`,
-            planId: null,
-            planName: null,
-            quantity: 1,
-            priceInCents: totalCents,
-          }],
-          trackingParameters: getUtms(),
-          commission: {
-            totalPriceInCents: totalCents,
-            gatewayFeeInCents: 0,
-            userCommissionInCents: totalCents,
-            currency: "BRL" as const,
-          },
-        },
-      }).catch(() => {});
+      fireTracking(out, data);
     } catch (e: any) {
       setError(e?.message || "Erro ao gerar PIX. Tente novamente.");
     } finally {
