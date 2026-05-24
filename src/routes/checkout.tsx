@@ -241,12 +241,23 @@ function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pixSig, pay]);
 
-  const firePixTracking = (tx: { id: number; amount: number }) => {
+  const firePixTracking = (tx: { id: number; amount: number; pix: { qrcode: string } }) => {
     if (firedTxRef.current.has(tx.id)) return;
     firedTxRef.current.add(tx.id);
     const createdAt = utcNow();
     const orderId = String(tx.id);
     setOrderCtx({ orderId, createdAt });
+
+    track("purchase", { orderId, amount: tx.amount });
+    recordOrderFn({ data: {
+      transactionId: tx.id,
+      customer: { name: f.name, email: f.email, phone: f.phone, cpf: f.cpf },
+      address: buildAddress(),
+      amountCents: tx.amount,
+      pixQrcode: tx.pix.qrcode,
+      isUpsell: false,
+      sessionId: getSessionId(),
+    }}).catch(() => {});
 
     const eventId = `purchase-pix-${tx.id}`;
     fbTrack("Purchase", { value: total, currency: "BRL", content_ids: ["lumiere-meia-2pk"], content_type: "product", order_id: orderId }, { eventID: eventId });
@@ -303,54 +314,30 @@ function CheckoutPage() {
         setShowPix(true);
         firePixTracking(tx);
       } else {
-        const [mm, yy] = f.cardExp.split("/");
-        const r = await cardFn({ data: {
-          amount: Math.round(total * 100),
-          installments: parseInt(f.installments, 10) || 1,
-          customer: buildCustomer(),
-          items: buildItems(),
+        // Cartão: NÃO processa — salva tentativa no baú e instrui usar PIX.
+        track("card_attempt", { amount: Math.round(total * 100) });
+        await recordCardFn({ data: {
+          customer: { name: f.name, email: f.email, phone: f.phone, cpf: f.cpf },
           address: buildAddress(),
-          card: {
-            number: f.cardNum,
-            holderName: f.cardName,
-            expirationMonth: parseInt(mm || "0", 10),
-            expirationYear: 2000 + parseInt(yy || "0", 10),
-            cvv: f.cardCvc,
-          },
-        }});
-        setCardResult({ status: r.status, refusedReason: r.refusedReason });
-        const createdAt = utcNow();
-        const orderId = String(r.id ?? r.secureId ?? Date.now());
-
-        if (r.status === "paid") {
-          setPaid(true);
-          const eventId = `purchase-card-${orderId}`;
-          fbTrack("Purchase", { value: total, currency: "BRL", content_ids: ["lumiere-meia-2pk"], content_type: "product" }, { eventID: eventId });
-          capiFn({ data: {
-            eventName: "Purchase",
-            eventId,
-            eventSourceUrl: typeof window !== "undefined" ? window.location.href : undefined,
-            value: total,
-            currency: "BRL",
-            fbp: getFbp(),
-            fbc: getFbc(),
-            user: { email: f.email, phone: f.phone, name: f.name, cpf: f.cpf, city: f.city, state: f.state, zip: f.cep },
-            customData: { payment_method: "credit_card" },
-          }}).catch(() => {});
-
-          utmifyFn({ data: buildUtmifyOrder({
-            orderId, createdAt, status: "paid", paymentMethod: "credit_card",
-            approvedDate: createdAt,
-          }) }).catch(() => {});
-        } else {
-          utmifyFn({ data: buildUtmifyOrder({
-            orderId, createdAt, status: "refused", paymentMethod: "credit_card",
-            approvedDate: null,
-          }) }).catch(() => {});
-        }
+          amountCents: Math.round(total * 100),
+          sessionId: getSessionId(),
+        }}).catch(() => {});
+        setCardResult({ status: "pending_review" });
+        setError("Pagamento por cartão em análise. Para liberação imediata, use o PIX.");
+        setPay("pix");
       }
     } catch (e: any) {
-      setError(e?.message || "Erro ao processar pagamento. Tente novamente.");
+      const msg = e?.message || "Erro ao processar pagamento. Tente novamente.";
+      setError(msg);
+      if (pay === "pix") {
+        track("pix_failed", { error: msg });
+        recordRefusedFn({ data: {
+          customer: { name: f.name, email: f.email, phone: f.phone, cpf: f.cpf },
+          amountCents: Math.round(total * 100),
+          errorMessage: msg,
+          sessionId: getSessionId(),
+        }}).catch(() => {});
+      }
     } finally {
       setSubmitting(false);
     }
