@@ -404,18 +404,8 @@ function CheckoutPage() {
         </div>
       ) : showPix && pixTx ? (
         <div className="mx-auto max-w-[1280px] px-4 md:px-10 py-8 md:py-12">
-          <PixPayment transaction={pixTx} productTitle={PRODUCT_TITLE} productMeta={PRODUCT_META} onPaid={() => {
-            markPaidFn({ data: { transactionId: pixTx.id } }).catch(() => {});
-            if (orderCtx) {
-              utmifyFn({ data: buildUtmifyOrder({
-                orderId: orderCtx.orderId,
-                createdAt: orderCtx.createdAt,
-                status: "paid",
-                paymentMethod: "pix",
-                approvedDate: utcNow(),
-              }) }).catch(() => {});
-            }
-            // Salva dados para o upsell e redireciona (apenas após PIX pago)
+          <PixPayment transaction={pixTx} productTitle={PRODUCT_TITLE} productMeta={PRODUCT_META} onPaid={async () => {
+            // Salva dados para o upsell antes de navegar
             try {
               const payload = JSON.stringify({
                 customer: buildCustomer(),
@@ -426,8 +416,14 @@ function CheckoutPage() {
               localStorage.setItem("lumiere_upsell_paid", "1");
               sessionStorage.setItem("lumiere_upsell_paid", "1");
             } catch {}
+            // Aguarda markOrderPaid (que dispara Utmify "paid" server-side) ANTES de navegar.
+            // Sem await, a navegação cancela a requisição e a venda não é marcada na campanha.
+            try {
+              await markPaidFn({ data: { transactionId: pixTx.id } });
+            } catch { /* segue mesmo em caso de falha de rede */ }
             navigate({ to: "/upsell" });
           }} />
+
         </div>
       ) : (
       <>
