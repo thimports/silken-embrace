@@ -6,7 +6,15 @@ import { z } from "zod";
 const ctx = () => {
   let ip: string | undefined;
   let ua: string | undefined;
-  try { ip = getRequestIP({ xForwardedFor: true }) || undefined; } catch {}
+  try {
+    // Cloudflare / common proxy headers, in order of trust
+    ip =
+      getRequestHeader("cf-connecting-ip") ||
+      getRequestHeader("x-real-ip") ||
+      getRequestHeader("x-forwarded-for")?.split(",")[0]?.trim() ||
+      getRequestIP({ xForwardedFor: true }) ||
+      undefined;
+  } catch {}
   try { ua = getRequestHeader("user-agent") || undefined; } catch {}
   return { ip, ua };
 };
