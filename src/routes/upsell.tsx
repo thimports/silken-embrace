@@ -81,19 +81,27 @@ function UpsellPage() {
   const color = useMemo(() => COLORS.find((c) => c.id === colorId)!, [colorId]);
 
   const acceptOffer = async () => {
-    if (!saved) {
-      navigate({ to: "/" });
-      return;
-    }
     setError(null);
     setSubmitting(true);
     try {
+      let data = saved;
+      if (!data) {
+        try {
+          const raw = localStorage.getItem("lumiere_upsell") || sessionStorage.getItem("lumiere_upsell");
+          if (raw) {
+            data = JSON.parse(raw) as Saved;
+            setSaved(data);
+          }
+        } catch { /* ignore */ }
+      }
+      if (!data) throw new Error("Não encontramos seus dados. Recarregue a página do checkout.");
+
       const tx = await pixFn({
         data: {
           amount: Math.round(PRICE * 100),
-          customer: saved.customer,
+          customer: data.customer,
           items: [{ title: `${PRODUCT_TITLE} · ${color.name}`, unitPrice: Math.round(PRICE * 100), quantity: 1, tangible: true }],
-          address: saved.address,
+          address: data.address,
         },
       });
       if (!tx?.pix?.qrcode) throw new Error("Não recebemos o código PIX. Tente novamente.");
@@ -114,13 +122,13 @@ function UpsellPage() {
           fbp: getFbp(),
           fbc: getFbc(),
           user: {
-            email: saved.customer.email,
-            phone: saved.customer.phone,
-            name: saved.customer.name,
-            cpf: saved.customer.document,
-            city: saved.address.city,
-            state: saved.address.state,
-            zip: saved.address.zipCode,
+            email: data.customer.email,
+            phone: data.customer.phone,
+            name: data.customer.name,
+            cpf: data.customer.document,
+            city: data.address.city,
+            state: data.address.state,
+            zip: data.address.zipCode,
           },
           customData: { order_id: orderId, payment_method: "pix", upsell: true },
         },
@@ -137,10 +145,10 @@ function UpsellPage() {
           approvedDate: null,
           refundedAt: null,
           customer: {
-            name: saved.customer.name,
-            email: saved.customer.email,
-            phone: onlyDigits(saved.customer.phone) || null,
-            document: onlyDigits(saved.customer.document) || null,
+            name: data.customer.name,
+            email: data.customer.email,
+            phone: onlyDigits(data.customer.phone) || null,
+            document: onlyDigits(data.customer.document) || null,
             country: "BR",
           },
           products: [{
