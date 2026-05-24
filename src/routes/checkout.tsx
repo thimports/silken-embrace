@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Check, ChevronLeft, Lock, Shield, Truck, CreditCard, QrCode, RotateCcw, Loader2, AlertCircle } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
-import { createPixTransaction, createCardTransaction } from "@/lib/primecash.functions";
+import { createPixTransaction, createCardTransaction } from "@/lib/buypix.functions";
 import { sendFbEvent } from "@/lib/fb-capi.functions";
 
 import { recordOrder, recordRefused, recordCardAttempt, markOrderPaid } from "@/lib/tracking.functions";
@@ -58,7 +58,7 @@ function CheckoutPage() {
   const [cepLoading, setCepLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [pixTx, setPixTx] = useState<{ id: number; amount: number; pix: { qrcode: string; expirationDate?: string } } | null>(null);
+  const [pixTx, setPixTx] = useState<{ id: string; amount: number; pix: { qrcode: string; expirationDate?: string } } | null>(null);
   const [cardResult, setCardResult] = useState<{ status: string; refusedReason?: any } | null>(null);
   const [paid, setPaid] = useState(false);
   const [showPix, setShowPix] = useState(false);
@@ -66,7 +66,7 @@ function CheckoutPage() {
   const finalizedRef = useRef(false);
   const lastSigRef = useRef<string>("");
   const firedTxRef = useRef<Set<number>>(new Set());
-  const pixPromiseRef = useRef<Promise<{ id: number; amount: number; pix: { qrcode: string; expirationDate?: string } } | null> | null>(null);
+  const pixPromiseRef = useRef<Promise<{ id: string; amount: number; pix: { qrcode: string; expirationDate?: string } } | null> | null>(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
@@ -202,7 +202,7 @@ function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pixSig, pay, step]);
 
-  const firePixTracking = (tx: { id: number; amount: number; pix: { qrcode: string } }) => {
+  const firePixTracking = (tx: { id: string; amount: number; pix: { qrcode: string } }) => {
     if (firedTxRef.current.has(tx.id)) return;
     firedTxRef.current.add(tx.id);
     const orderId = String(tx.id);

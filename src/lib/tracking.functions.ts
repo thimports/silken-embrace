@@ -100,7 +100,7 @@ const ProductSchema = z.object({
 });
 
 const OrderSchema = z.object({
-  transactionId: z.number().int(),
+  transactionId: z.string().min(1).max(100),
   customer: z.object({
     name: z.string().min(1).max(200),
     email: z.string().email().max(255),
@@ -179,7 +179,7 @@ export const recordOrder = createServerFn({ method: "POST" })
   });
 
 export const markOrderPaid = createServerFn({ method: "POST" })
-  .inputValidator((d: { transactionId: number }) => z.object({ transactionId: z.number().int() }).parse(d))
+  .inputValidator((d: { transactionId: string }) => z.object({ transactionId: z.string().min(1).max(100) }).parse(d))
   .handler(async ({ data }) => {
     const paidAtIso = new Date().toISOString();
     const { data: rows } = await supabaseAdmin.from("orders")
