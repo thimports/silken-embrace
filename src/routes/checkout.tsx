@@ -74,7 +74,7 @@ function CheckoutPage() {
 
   const SHIPPING = [
     { id: "free", label: "Frete Grátis", speed: "7-8 dias úteis", price: 0 },
-    { id: "express", label: "Loggi Express", speed: "3-4 dias úteis", price: 15 },
+    { id: "express", label: "Loggi Express", speed: "3-4 dias úteis", price: 18.27 },
   ] as const;
   const [shippingId, setShippingId] = useState<string>("free");
   const shipping = SHIPPING.find((s) => s.id === shippingId)?.price ?? 0;
