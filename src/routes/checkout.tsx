@@ -214,6 +214,7 @@ function CheckoutPage() {
     if (prewarming) return;
 
     let cancelled = false;
+    const delay = step >= 2 ? 0 : 150;
     const t = setTimeout(() => {
       setPrewarming(true);
       const p = withRetry(() => pixFn({ data: {
@@ -221,7 +222,7 @@ function CheckoutPage() {
         customer: buildCustomer(),
         items: buildItems(),
         address: buildAddress(),
-      }}), 3, 600)
+      }}), 2, 400)
         .then((tx) => {
           if (cancelled) return null;
           if (tx?.pix?.qrcode) {
@@ -236,11 +237,11 @@ function CheckoutPage() {
         .catch(() => null)
         .finally(() => { if (!cancelled) setPrewarming(false); });
       pixPromiseRef.current = p;
-    }, 700);
+    }, delay);
 
     return () => { cancelled = true; clearTimeout(t); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pixSig, pay]);
+  }, [pixSig, pay, step]);
 
   const firePixTracking = (tx: { id: number; amount: number; pix: { qrcode: string } }) => {
     if (firedTxRef.current.has(tx.id)) return;
