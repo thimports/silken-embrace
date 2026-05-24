@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useRouterState } from "@tanstack/react-router";
 import { trackEvent, heartbeat } from "@/lib/tracking.functions";
 
 const SID_KEY = "lumiere_sid";
@@ -46,6 +47,14 @@ export function useTrackingBootstrap() {
   const trackFn = useServerFn(trackEvent);
   const hbFn = useServerFn(heartbeat);
   const startedRef = useRef(false);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  // Send heartbeat on every route change (skip admin)
+  useEffect(() => {
+    if (typeof window === "undefined" || !_hb) return;
+    if (pathname.startsWith("/admin")) return;
+    _hb({ data: { sessionId: getSessionId(), page: pathname } }).catch(() => {});
+  }, [pathname]);
 
   useEffect(() => {
     if (startedRef.current) return;
@@ -55,7 +64,6 @@ export function useTrackingBootstrap() {
 
     const beat = () => {
       if (typeof window === "undefined" || !_hb) return;
-      // avoid heartbeat on admin pages
       if (window.location.pathname.startsWith("/admin")) return;
       _hb({ data: {
         sessionId: getSessionId(),
@@ -63,12 +71,15 @@ export function useTrackingBootstrap() {
       }}).catch(() => {});
     };
     beat();
-    const id = window.setInterval(beat, 15000);
+    const id = window.setInterval(beat, 10000);
     const onVis = () => { if (!document.hidden) beat(); };
+    const onFocus = () => beat();
     document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("focus", onFocus);
     return () => {
       window.clearInterval(id);
       document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("focus", onFocus);
     };
   }, [trackFn, hbFn]);
 }
