@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { ChevronLeft, Lock, ShieldCheck, Truck, Sparkles, Check, Loader2, X } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
-import { createPixTransaction } from "@/lib/buypix.functions";
+import { createPixTransaction } from "@/lib/primecash.functions";
 import { sendFbEvent } from "@/lib/fb-capi.functions";
 
 import { fbTrack, getFbp, getFbc, newEventId } from "@/lib/fbpixel";
