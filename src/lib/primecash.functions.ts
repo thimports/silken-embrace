@@ -19,25 +19,33 @@ type AddressInput = {
   state: string;
 };
 
-const API_BASE = "https://buypix.me/api/v1";
+const API_BASE = "https://api.primecashbrasil.com/v1";
+
+const onlyDigits = (s?: string | null) => (s ?? "").replace(/\D/g, "");
 
 function authHeaders(extra?: Record<string, string>) {
-  const key = process.env.BUYPIX_API_KEY;
-  if (!key) throw new Error("BUYPIX_API_KEY não configurada");
+  const key = process.env.PRIMECASH_SECRET_KEY;
+  if (!key) throw new Error("PRIMECASH_SECRET_KEY não configurada");
+  const basic = Buffer.from(`${key}:x`).toString("base64");
   return {
-    Authorization: `Bearer ${key}`,
+    Authorization: `Basic ${basic}`,
     "Content-Type": "application/json",
+    Accept: "application/json",
     ...(extra ?? {}),
   };
 }
 
-async function buypixRequest(path: string, init: RequestInit) {
+async function primecashRequest(path: string, init: RequestInit) {
   const res = await fetch(`${API_BASE}${path}`, init);
   const text = await res.text();
   let data: any;
   try { data = JSON.parse(text); } catch { data = { raw: text }; }
   if (!res.ok) {
-    const message = data?.message || data?.error || `Erro BuyPix (${res.status})`;
+    const message =
+      data?.message ||
+      data?.error ||
+      (Array.isArray(data?.errors) ? data.errors.map((e: any) => e?.message || JSON.stringify(e)).join("; ") : null) ||
+      `Erro PrimeCash (${res.status})`;
     throw new Error(typeof message === "string" ? message : JSON.stringify(message));
   }
   return data;
@@ -45,12 +53,29 @@ async function buypixRequest(path: string, init: RequestInit) {
 
 function mapStatus(s?: string): string {
   if (!s) return "pending";
-  if (s === "depix_sent" || s === "completed") return "paid";
+  if (s === "paid" || s === "approved") return "paid";
   return s;
 }
 
-// Mantém a mesma assinatura do antigo primecash.createPixTransaction
-// (amount em centavos, customer, items, address) para minimizar mudanças no checkout/upsell.
+function buildCustomer(c: CustomerInput) {
+  const doc = onlyDigits(c.document);
+  return {
+    name: c.name,
+    email: c.email,
+    phone: onlyDigits(c.phone),
+    document: { number: doc, type: doc.length === 14 ? "cnpj" : "cpf" },
+  };
+}
+
+function buildItems(items: Item[]) {
+  return items.map((i) => ({
+    title: i.title,
+    unitPrice: Math.round(i.unitPrice),
+    quantity: i.quantity,
+    tangible: i.tangible,
+  }));
+}
+
 export const createPixTransaction = createServerFn({ method: "POST" })
   .inputValidator((input: {
     amount: number;
@@ -59,34 +84,35 @@ export const createPixTransaction = createServerFn({ method: "POST" })
     address?: AddressInput;
   }) => input)
   .handler(async ({ data }) => {
-    const amountBrl = Math.round(data.amount) / 100;
-    const body: Record<string, unknown> = { amount: amountBrl };
+    const body: Record<string, unknown> = {
+      amount: Math.round(data.amount),
+      paymentMethod: "pix",
+      customer: buildCustomer(data.customer),
+      items: buildItems(data.items),
+    };
 
-    const res = await buypixRequest("/deposits", {
+    const tx = await primecashRequest("/transactions", {
       method: "POST",
-      headers: authHeaders({ "X-Idempotency-Key": crypto.randomUUID() }),
+      headers: authHeaders(),
       body: JSON.stringify(body),
     });
-    const tx = res?.data ?? res;
-    const qrcode = tx?.pix_qr_code || tx?.qrcode || null;
-    const expiresAt = tx?.expires_at || null;
 
+    const qrcode = tx?.pix?.qrcode || null;
     if (!qrcode || !tx?.id) {
-      console.error("BuyPix retornou sem QR code:", JSON.stringify(tx).slice(0, 2000));
+      console.error("PrimeCash retornou sem QR code:", JSON.stringify(tx).slice(0, 2000));
       throw new Error("Pagamento PIX indisponível no momento. Tente novamente em instantes.");
     }
 
     return {
       id: String(tx.id),
-      secureId: String(tx.id),
+      secureId: String(tx.secureId ?? tx.id),
       status: mapStatus(tx.status),
-      amount: Math.round(Number(tx.amount ?? amountBrl) * 100),
-      pix: { qrcode: String(qrcode), expirationDate: expiresAt },
+      amount: Number(tx.amount ?? data.amount),
+      pix: { qrcode: String(qrcode), expirationDate: tx.pix?.expirationDate ?? null },
     };
   });
 
-// BuyPix não processa cartão — mantido como stub para compatibilidade.
-// O fluxo de cartão no checkout apenas registra a tentativa no "baú" (recordCardAttempt).
+// Cartão: mantém-se como stub. O fluxo de checkout já registra a tentativa no "baú".
 export const createCardTransaction = createServerFn({ method: "POST" })
   .inputValidator((input: {
     amount: number;
@@ -109,12 +135,11 @@ export const createCardTransaction = createServerFn({ method: "POST" })
 export const getTransactionStatus = createServerFn({ method: "GET" })
   .inputValidator((input: { id: string }) => input)
   .handler(async ({ data }) => {
-    const res = await buypixRequest(`/deposits/${encodeURIComponent(data.id)}`, {
+    const tx = await primecashRequest(`/transactions/${encodeURIComponent(data.id)}`, {
       method: "GET",
       headers: authHeaders(),
     });
-    const tx = res?.data ?? res;
     const status = mapStatus(tx?.status);
-    const paidAt = status === "paid" ? (tx?.completed_at || tx?.updated_at || null) : null;
+    const paidAt = status === "paid" ? (tx?.paidAt || tx?.updatedAt || null) : null;
     return { id: String(tx?.id ?? data.id), status, paidAt };
   });
