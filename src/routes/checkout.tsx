@@ -165,12 +165,12 @@ function CheckoutPage() {
     const delay = step >= 2 ? 0 : 150;
     const t = setTimeout(() => {
       setPrewarming(true);
-      const p = withRetry(() => pixFn({ data: {
+      const p = pixFn({ data: {
         amount: Math.round(total * 100),
         customer: buildCustomer(),
         items: buildItems(),
         address: buildAddress(),
-      }}), 2, 400)
+      }})
         .then((tx) => {
           if (cancelled) return null;
           if (tx?.pix?.qrcode) {
