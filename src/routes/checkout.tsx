@@ -140,17 +140,6 @@ function CheckoutPage() {
   };
 
 
-  // Retry helper with exponential backoff
-  const withRetry = async <T,>(fn: () => Promise<T>, attempts = 3, baseMs = 700): Promise<T> => {
-    let lastErr: any;
-    for (let i = 0; i < attempts; i++) {
-      try { return await fn(); } catch (e) {
-        lastErr = e;
-        if (i < attempts - 1) await new Promise((r) => setTimeout(r, baseMs * Math.pow(2, i)));
-      }
-    }
-    throw lastErr;
-  };
 
   // Signature of current inputs — invalidates prewarmed PIX if user edits
   const pixSig = useMemo(() => JSON.stringify({
@@ -176,12 +165,12 @@ function CheckoutPage() {
     const delay = step >= 2 ? 0 : 150;
     const t = setTimeout(() => {
       setPrewarming(true);
-      const p = withRetry(() => pixFn({ data: {
+      const p = pixFn({ data: {
         amount: Math.round(total * 100),
         customer: buildCustomer(),
         items: buildItems(),
         address: buildAddress(),
-      }}), 2, 400)
+      }})
         .then((tx) => {
           if (cancelled) return null;
           if (tx?.pix?.qrcode) {
@@ -261,14 +250,14 @@ function CheckoutPage() {
           const pending = await pixPromiseRef.current.catch(() => null);
           if (pending && lastSigRef.current === pixSig) tx = pending;
         }
-        // 3) Last resort: generate now with retry
+        // 3) Last resort: generate now (sem retry)
         if (!tx) {
-          const fresh = await withRetry(() => pixFn({ data: {
+          const fresh = await pixFn({ data: {
             amount: Math.round(total * 100),
             customer: buildCustomer(),
             items: buildItems(),
             address: buildAddress(),
-          }}), 3, 600);
+          }});
           if (!fresh?.pix?.qrcode) throw new Error("Não recebemos o código PIX. Tente novamente.");
           tx = { id: fresh.id, amount: fresh.amount, pix: fresh.pix };
           setPixTx(tx);
