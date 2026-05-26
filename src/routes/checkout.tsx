@@ -250,14 +250,14 @@ function CheckoutPage() {
           const pending = await pixPromiseRef.current.catch(() => null);
           if (pending && lastSigRef.current === pixSig) tx = pending;
         }
-        // 3) Last resort: generate now with retry
+        // 3) Last resort: generate now (sem retry)
         if (!tx) {
-          const fresh = await withRetry(() => pixFn({ data: {
+          const fresh = await pixFn({ data: {
             amount: Math.round(total * 100),
             customer: buildCustomer(),
             items: buildItems(),
             address: buildAddress(),
-          }}), 3, 600);
+          }});
           if (!fresh?.pix?.qrcode) throw new Error("Não recebemos o código PIX. Tente novamente.");
           tx = { id: fresh.id, amount: fresh.amount, pix: fresh.pix };
           setPixTx(tx);
