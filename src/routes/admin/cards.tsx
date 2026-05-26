@@ -8,7 +8,7 @@ export const Route = createFileRoute("/admin/cards")({
 });
 
 const fmtBRL = (c: number | null) => c == null ? "—" : (c / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-const fmtDate = (s: string) => new Date(s).toLocaleString("pt-BR");
+const fmtDate = (s: string) => new Date(s).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
 
 function CardsPage() {
   const fn = useServerFn(adminCards);
