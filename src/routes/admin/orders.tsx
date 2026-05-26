@@ -8,7 +8,7 @@ export const Route = createFileRoute("/admin/orders")({
 });
 
 const fmtBRL = (c: number) => (c / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-const fmtDate = (s: string) => new Date(s).toLocaleString("pt-BR");
+const fmtDate = (s: string) => new Date(s).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
 
 function OrdersPage() {
   const fn = useServerFn(adminOrders);
