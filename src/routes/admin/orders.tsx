@@ -14,6 +14,14 @@ function OrdersPage() {
   const fn = useServerFn(adminOrders);
   const [rows, setRows] = useState<any[]>([]);
   const [filter, setFilter] = useState<"all" | "paid" | "waiting_payment">("all");
+  const [gateway, setGateway] = useState<"all" | "primecash" | "buypix">("all");
+
+  const gatewayOf = (txId?: string | null): "primecash" | "buypix" | "unknown" => {
+    if (!txId) return "unknown";
+    if (/^[0-9]+$/.test(txId)) return "buypix";
+    if (/^[0-9a-f]{8}-/i.test(txId)) return "primecash";
+    return "unknown";
+  };
 
   useEffect(() => {
     const load = () => fn({}).then((r) => setRows(r.rows)).catch(() => {});
