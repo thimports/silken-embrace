@@ -85,22 +85,40 @@ export const claimMetaPix = createServerFn({ method: "POST" })
     };
   });
 
-// Status check usado pelo PixPayment polling. Devolve "paid" se o admin marcou.
+// Status check usado pelo PixPayment polling.
+// Tenta auto-confirmar consultando a Location dinâmica do PSP (sem scraping).
 export const getMetaPixStatus = createServerFn({ method: "GET" })
   .inputValidator((d: { id: string }) => z.object({ id: z.string().min(1) }).parse(d))
   .handler(async ({ data }) => {
     const id = data.id.replace(/^meta-/, "");
     const { data: row } = await supabaseAdmin
       .from("pix_meta_ads")
-      .select("id,status,paid_at")
+      .select("id,code,status,paid_at")
       .eq("id", id)
       .maybeSingle();
-    return {
-      id: data.id,
-      status: row?.status === "paid" ? "paid" : "pending",
-      paidAt: row?.paid_at ?? null,
-    };
+
+    if (!row) return { id: data.id, status: "pending", paidAt: null };
+    if (row.status === "paid") return { id: data.id, status: "paid", paidAt: row.paid_at };
+
+    // Consulta o PSP via Location dinâmica do BR Code
+    try {
+      const { consultarPix } = await import("./pix-psp.server");
+      const r = await consultarPix(row.code);
+      if (r.status === "CONCLUIDA") {
+        const nowIso = new Date().toISOString();
+        await supabaseAdmin
+          .from("pix_meta_ads")
+          .update({ status: "paid", paid_at: nowIso, notes: `auto:${r.provider || "psp"}` })
+          .eq("id", id)
+          .eq("status", "in_use");
+        return { id: data.id, status: "paid", paidAt: nowIso };
+      }
+    } catch {
+      // ignore — fica em pending
+    }
+    return { id: data.id, status: "pending", paidAt: null };
   });
+
 
 // --- Admin ---
 
