@@ -8,8 +8,9 @@ import {
   adminReleaseMetaPix,
   adminDeleteMetaPix,
   adminDeleteExpiredMetaPix,
+  adminCheckMetaPixAtPsp,
 } from "@/lib/pix-meta.functions";
-import { Copy, Trash2, CheckCircle2, RotateCcw, Plus, AlertTriangle, Clock, CircleDollarSign, CircleCheckBig } from "lucide-react";
+import { Copy, Trash2, CheckCircle2, RotateCcw, Plus, AlertTriangle, Clock, CircleDollarSign, CircleCheckBig, Search } from "lucide-react";
 
 export const Route = createFileRoute("/admin/pix-meta")({
   component: PixMetaPage,
