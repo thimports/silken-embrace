@@ -120,7 +120,24 @@ function PixMetaPage() {
         <div className="mb-4 px-3 py-2 text-sm rounded-md bg-amber-50 border border-amber-200 text-amber-800">{msg}</div>
       )}
 
-      <div className="flex gap-3 mb-6">
+      <div className="flex gap-3 mb-6 flex-wrap">
+        <button
+          onClick={async () => {
+            setMsg(null);
+            setBusy(true);
+            try {
+              const r = await checkPsp({});
+              setMsg(`Verificados ${r.checked} · ${r.paid} marcados como pagos.`);
+              await load();
+            } catch (e: any) {
+              setMsg(e?.message || "Falha na verificação.");
+            } finally { setBusy(false); }
+          }}
+          disabled={busy || counts.in_use === 0}
+          className="inline-flex items-center gap-2 px-3 py-2 text-xs rounded-md bg-white border border-neutral-300 text-neutral-800 hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          <Search className="h-3.5 w-3.5" /> Verificar status no PSP ({counts.in_use} em uso)
+        </button>
         <button
           onClick={onDeleteExpired}
           disabled={counts.expired === 0}
