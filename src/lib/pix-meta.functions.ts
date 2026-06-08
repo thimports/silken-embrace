@@ -73,8 +73,8 @@ export const claimMetaPix = createServerFn({ method: "POST" })
 
     if (updErr) throw new Error(updErr.message);
     if (!claimed) {
-      // race — tenta de novo uma vez
-      return claimMetaPix({ data });
+      // race com outro cliente — falha; o cliente tentará de novo
+      throw new Error("Conflito ao reservar PIX. Tente novamente.");
     }
 
     return {
