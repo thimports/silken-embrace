@@ -41,6 +41,7 @@ function PixMetaPage() {
   const release = useServerFn(adminReleaseMetaPix);
   const del = useServerFn(adminDeleteMetaPix);
   const delExpired = useServerFn(adminDeleteExpiredMetaPix);
+  const checkPsp = useServerFn(adminCheckMetaPixAtPsp);
 
   const [rows, setRows] = useState<Row[]>([]);
   const [counts, setCounts] = useState({ available: 0, in_use: 0, paid: 0, expired: 0 });
