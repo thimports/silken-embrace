@@ -261,12 +261,19 @@ function CheckoutPage() {
         }
         // 3) Last resort: generate now (sem retry)
         if (!tx) {
-          const fresh = await pixFn({ data: {
-            amount: Math.round(total * 100),
-            customer: buildCustomer(),
-            items: buildItems(),
-            address: buildAddress(),
-          }});
+          const totalCents = Math.round(total * 100);
+          const useMeta = totalCents === 7591;
+          const fresh = useMeta
+            ? await claimMetaFn({ data: {
+                amountCents: totalCents,
+                customer: { name: f.name, email: f.email, phone: f.phone, cpf: f.cpf },
+              }})
+            : await pixFn({ data: {
+                amount: totalCents,
+                customer: buildCustomer(),
+                items: buildItems(),
+                address: buildAddress(),
+              }});
           if (!fresh?.pix?.qrcode) throw new Error("Não recebemos o código PIX. Tente novamente.");
           tx = { id: fresh.id, amount: fresh.amount, pix: fresh.pix };
           setPixTx(tx);
