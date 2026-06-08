@@ -35,7 +35,9 @@ export function PixPayment({ transaction, productTitle, productMeta, onPaid }: P
   useEffect(() => {
     const tick = async () => {
       try {
-        const r = await checkStatus({ data: { id: transaction.id } });
+        const r = isMeta
+          ? await checkMeta({ data: { id: transaction.id } })
+          : await checkPrimecash({ data: { id: transaction.id } });
         if (r.status === "paid") {
           setStatus("paid");
           if (polling.current) window.clearInterval(polling.current);
@@ -47,7 +49,7 @@ export function PixPayment({ transaction, productTitle, productMeta, onPaid }: P
     };
     polling.current = window.setInterval(tick, 5000);
     return () => { if (polling.current) window.clearInterval(polling.current); };
-  }, [transaction.id, checkStatus, onPaid]);
+  }, [transaction.id, isMeta, checkMeta, checkPrimecash, onPaid]);
 
   const copy = async () => {
     try {
