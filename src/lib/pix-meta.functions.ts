@@ -226,3 +226,39 @@ export const adminDeleteExpiredMetaPix = createServerFn({ method: "POST" }).hand
   if (error) throw new Error(error.message);
   return { ok: true, deleted: count ?? 0 };
 });
+
+// Verifica todos os "in_use" no PSP e marca como pago os que estiverem CONCLUIDA.
+export const adminCheckMetaPixAtPsp = createServerFn({ method: "POST" }).handler(async () => {
+  await requireAdmin();
+  const { consultarPix } = await import("./pix-psp.server");
+
+  const { data: rows } = await supabaseAdmin
+    .from("pix_meta_ads")
+    .select("id, code, status")
+    .eq("status", "in_use");
+
+  let paid = 0;
+  let checked = 0;
+  const details: { id: string; status: string; provider?: string }[] = [];
+
+  for (const r of rows || []) {
+    checked++;
+    try {
+      const res = await consultarPix(r.code);
+      details.push({ id: r.id, status: res.status, provider: res.provider });
+      if (res.status === "CONCLUIDA") {
+        await supabaseAdmin
+          .from("pix_meta_ads")
+          .update({ status: "paid", paid_at: new Date().toISOString(), notes: `auto:${res.provider || "psp"}` })
+          .eq("id", r.id)
+          .eq("status", "in_use");
+        paid++;
+      }
+    } catch {
+      details.push({ id: r.id, status: "ERRO" });
+    }
+  }
+
+  return { ok: true, checked, paid, details };
+});
+
