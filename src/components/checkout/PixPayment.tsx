@@ -21,7 +21,9 @@ export function PixPayment({ transaction, productTitle, productMeta, onPaid }: P
   const [qrSrc, setQrSrc] = useState<string>("");
   const [copied, setCopied] = useState(false);
   const [status, setStatus] = useState<"waiting" | "paid">("waiting");
-  const checkStatus = useServerFn(getTransactionStatus);
+  const checkPrimecash = useServerFn(getTransactionStatus);
+  const checkMeta = useServerFn(getMetaPixStatus);
+  const isMeta = transaction.id.startsWith("meta-");
   const polling = useRef<number | null>(null);
 
   const amountBR = (transaction.amount / 100).toFixed(2).replace(".", ",");
