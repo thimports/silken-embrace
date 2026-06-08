@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import { Copy, CheckCircle2, Clock, ShieldCheck, Loader2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { getTransactionStatus } from "@/lib/primecash.functions";
+import { getMetaPixStatus } from "@/lib/pix-meta.functions";
 import hero from "@/assets/product-1.webp";
 
 type Props = {
