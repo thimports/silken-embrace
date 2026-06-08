@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tan
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { adminCheck, adminLogout } from "@/lib/admin.functions";
-import { LayoutDashboard, ShoppingBag, XCircle, CreditCard, Activity, LogOut, Loader2 } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, XCircle, CreditCard, Activity, LogOut, Loader2, Megaphone } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin · Lumière" }, { name: "robots", content: "noindex,nofollow" }] }),
