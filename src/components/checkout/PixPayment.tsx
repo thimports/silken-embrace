@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import { Copy, CheckCircle2, Clock, ShieldCheck, Loader2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { getTransactionStatus } from "@/lib/primecash.functions";
+import { getMetaPixStatus } from "@/lib/pix-meta.functions";
 import hero from "@/assets/product-1.webp";
 
 type Props = {
@@ -20,7 +21,9 @@ export function PixPayment({ transaction, productTitle, productMeta, onPaid }: P
   const [qrSrc, setQrSrc] = useState<string>("");
   const [copied, setCopied] = useState(false);
   const [status, setStatus] = useState<"waiting" | "paid">("waiting");
-  const checkStatus = useServerFn(getTransactionStatus);
+  const checkPrimecash = useServerFn(getTransactionStatus);
+  const checkMeta = useServerFn(getMetaPixStatus);
+  const isMeta = transaction.id.startsWith("meta-");
   const polling = useRef<number | null>(null);
 
   const amountBR = (transaction.amount / 100).toFixed(2).replace(".", ",");
@@ -32,7 +35,9 @@ export function PixPayment({ transaction, productTitle, productMeta, onPaid }: P
   useEffect(() => {
     const tick = async () => {
       try {
-        const r = await checkStatus({ data: { id: transaction.id } });
+        const r = isMeta
+          ? await checkMeta({ data: { id: transaction.id } })
+          : await checkPrimecash({ data: { id: transaction.id } });
         if (r.status === "paid") {
           setStatus("paid");
           if (polling.current) window.clearInterval(polling.current);
@@ -44,7 +49,7 @@ export function PixPayment({ transaction, productTitle, productMeta, onPaid }: P
     };
     polling.current = window.setInterval(tick, 5000);
     return () => { if (polling.current) window.clearInterval(polling.current); };
-  }, [transaction.id, checkStatus, onPaid]);
+  }, [transaction.id, isMeta, checkMeta, checkPrimecash, onPaid]);
 
   const copy = async () => {
     try {

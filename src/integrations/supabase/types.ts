@@ -194,6 +194,63 @@ export type Database = {
         }
         Relationships: []
       }
+      pix_meta_ads: {
+        Row: {
+          amount_cents: number
+          assigned_at: string | null
+          code: string
+          created_at: string
+          customer_cpf: string | null
+          customer_email: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          expires_at: string
+          id: string
+          notes: string | null
+          paid_at: string | null
+          position: number
+          released_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_cents?: number
+          assigned_at?: string | null
+          code: string
+          created_at?: string
+          customer_cpf?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          expires_at: string
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          position: number
+          released_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          assigned_at?: string | null
+          code?: string
+          created_at?: string
+          customer_cpf?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          expires_at?: string
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          position?: number
+          released_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       refused_payments: {
         Row: {
           amount_cents: number | null

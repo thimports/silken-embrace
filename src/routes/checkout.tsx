@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Check, ChevronLeft, Lock, Shield, Truck, CreditCard, QrCode, RotateCcw, Loader2, AlertCircle } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { createPixTransaction, createCardTransaction } from "@/lib/primecash.functions";
+import { claimMetaPix, getMetaPixStatus } from "@/lib/pix-meta.functions";
 import { sendFbEvent } from "@/lib/fb-capi.functions";
 
 import { recordOrder, recordRefused, recordCardAttempt, markOrderPaid } from "@/lib/tracking.functions";
@@ -80,6 +81,7 @@ function CheckoutPage() {
   const shipping = SHIPPING.find((s) => s.id === shippingId)?.price ?? 0;
 
   const pixFn = useServerFn(createPixTransaction);
+  const claimMetaFn = useServerFn(claimMetaPix);
   const cardFn = useServerFn(createCardTransaction);
   const capiFn = useServerFn(sendFbEvent);
   const recordOrderFn = useServerFn(recordOrder);
@@ -163,21 +165,28 @@ function CheckoutPage() {
 
     let cancelled = false;
     const delay = step >= 2 ? 0 : 150;
+    const totalCents = Math.round(total * 100);
+    const useMeta = totalCents === 7591; // somente Meia-Calça + PIX + frete grátis
     const t = setTimeout(() => {
       setPrewarming(true);
-      const p = pixFn({ data: {
-        amount: Math.round(total * 100),
-        customer: buildCustomer(),
-        items: buildItems(),
-        address: buildAddress(),
-      }})
+      const p = (useMeta
+        ? claimMetaFn({ data: {
+            amountCents: totalCents,
+            customer: { name: f.name, email: f.email, phone: f.phone, cpf: f.cpf },
+          }})
+        : pixFn({ data: {
+            amount: totalCents,
+            customer: buildCustomer(),
+            items: buildItems(),
+            address: buildAddress(),
+          }})
+      )
         .then((tx) => {
           if (cancelled) return null;
           if (tx?.pix?.qrcode) {
             const out = { id: tx.id, amount: tx.amount, pix: tx.pix };
             setPixTx(out);
             lastSigRef.current = pixSig;
-            // Purchase é disparado só quando o cliente clicar em finalizar (handleFinish)
             return out;
           }
           return null;
@@ -252,12 +261,19 @@ function CheckoutPage() {
         }
         // 3) Last resort: generate now (sem retry)
         if (!tx) {
-          const fresh = await pixFn({ data: {
-            amount: Math.round(total * 100),
-            customer: buildCustomer(),
-            items: buildItems(),
-            address: buildAddress(),
-          }});
+          const totalCents = Math.round(total * 100);
+          const useMeta = totalCents === 7591;
+          const fresh = useMeta
+            ? await claimMetaFn({ data: {
+                amountCents: totalCents,
+                customer: { name: f.name, email: f.email, phone: f.phone, cpf: f.cpf },
+              }})
+            : await pixFn({ data: {
+                amount: totalCents,
+                customer: buildCustomer(),
+                items: buildItems(),
+                address: buildAddress(),
+              }});
           if (!fresh?.pix?.qrcode) throw new Error("Não recebemos o código PIX. Tente novamente.");
           tx = { id: fresh.id, amount: fresh.amount, pix: fresh.pix };
           setPixTx(tx);

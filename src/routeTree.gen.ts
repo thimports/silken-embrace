@@ -15,6 +15,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminRefusedRouteImport } from './routes/admin/refused'
+import { Route as AdminPixMetaRouteImport } from './routes/admin/pix-meta'
 import { Route as AdminOrdersRouteImport } from './routes/admin/orders'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminLiveRouteImport } from './routes/admin/live'
@@ -50,6 +51,11 @@ const AdminRefusedRoute = AdminRefusedRouteImport.update({
   path: '/refused',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPixMetaRoute = AdminPixMetaRouteImport.update({
+  id: '/pix-meta',
+  path: '/pix-meta',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminOrdersRoute = AdminOrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/admin/live': typeof AdminLiveRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/orders': typeof AdminOrdersRoute
+  '/admin/pix-meta': typeof AdminPixMetaRoute
   '/admin/refused': typeof AdminRefusedRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/admin/live': typeof AdminLiveRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/orders': typeof AdminOrdersRoute
+  '/admin/pix-meta': typeof AdminPixMetaRoute
   '/admin/refused': typeof AdminRefusedRoute
   '/admin': typeof AdminIndexRoute
 }
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/admin/live': typeof AdminLiveRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/orders': typeof AdminOrdersRoute
+  '/admin/pix-meta': typeof AdminPixMetaRoute
   '/admin/refused': typeof AdminRefusedRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/admin/live'
     | '/admin/login'
     | '/admin/orders'
+    | '/admin/pix-meta'
     | '/admin/refused'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/admin/live'
     | '/admin/login'
     | '/admin/orders'
+    | '/admin/pix-meta'
     | '/admin/refused'
     | '/admin'
   id:
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/admin/live'
     | '/admin/login'
     | '/admin/orders'
+    | '/admin/pix-meta'
     | '/admin/refused'
     | '/admin/'
   fileRoutesById: FileRoutesById
@@ -196,6 +208,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRefusedRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/pix-meta': {
+      id: '/admin/pix-meta'
+      path: '/pix-meta'
+      fullPath: '/admin/pix-meta'
+      preLoaderRoute: typeof AdminPixMetaRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/orders': {
       id: '/admin/orders'
       path: '/orders'
@@ -232,6 +251,7 @@ interface AdminRouteChildren {
   AdminLiveRoute: typeof AdminLiveRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminOrdersRoute: typeof AdminOrdersRoute
+  AdminPixMetaRoute: typeof AdminPixMetaRoute
   AdminRefusedRoute: typeof AdminRefusedRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -241,6 +261,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLiveRoute: AdminLiveRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminOrdersRoute: AdminOrdersRoute,
+  AdminPixMetaRoute: AdminPixMetaRoute,
   AdminRefusedRoute: AdminRefusedRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
@@ -256,13 +277,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
