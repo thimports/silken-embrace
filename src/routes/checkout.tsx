@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Check, ChevronLeft, Lock, Shield, Truck, CreditCard, QrCode, RotateCcw, Loader2, AlertCircle } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { createPixTransaction, createCardTransaction } from "@/lib/primecash.functions";
+import { claimMetaPix, getMetaPixStatus } from "@/lib/pix-meta.functions";
 import { sendFbEvent } from "@/lib/fb-capi.functions";
 
 import { recordOrder, recordRefused, recordCardAttempt, markOrderPaid } from "@/lib/tracking.functions";
