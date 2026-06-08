@@ -37,6 +37,7 @@ function AdminLayout() {
   const nav = [
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { to: "/admin/orders", label: "Pedidos", icon: ShoppingBag },
+    { to: "/admin/pix-meta", label: "PIX Meta Ads", icon: Megaphone },
     { to: "/admin/refused", label: "Recusados", icon: XCircle },
     { to: "/admin/cards", label: "Baú de Cartão", icon: CreditCard },
     { to: "/admin/live", label: "Ao Vivo", icon: Activity },
