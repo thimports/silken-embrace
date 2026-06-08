@@ -81,6 +81,7 @@ function CheckoutPage() {
   const shipping = SHIPPING.find((s) => s.id === shippingId)?.price ?? 0;
 
   const pixFn = useServerFn(createPixTransaction);
+  const claimMetaFn = useServerFn(claimMetaPix);
   const cardFn = useServerFn(createCardTransaction);
   const capiFn = useServerFn(sendFbEvent);
   const recordOrderFn = useServerFn(recordOrder);
